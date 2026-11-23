@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://2hib2prnckei"]
+
+[ext_resource type="Script" uid="uid://bdm2hswka08fo" path="res://grenades/frag_grenade.gd" id="1_0qko2"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_saui7"]
+radius = 2.0
+
+[node name="FragGrenade" type="RigidBody2D" unique_id=2055212464]
+collision_layer = 4
+collision_mask = 3
+script = ExtResource("1_0qko2")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=867441195]
+shape = SubResource("CircleShape2D_saui7")
+
+[node name="Timer" type="Timer" parent="." unique_id=974422368]
+wait_time = 2.0
+one_shot = true
+autostart = true
+
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

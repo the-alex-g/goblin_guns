@@ -1,20 +1,21 @@
 class_name Player
 extends CharacterBody2D
 
-const GRAVITY := 8.0
+const GRAVITY := 480.0
 
 @export var speed := 80
 @export var slide := Vector2(0.3, 0.1)
 @export var jump_strength := 150
 @export var bullet_speed := 320.0
+@export var grenade_speed := 150.0
 @export var disabled = false
 @export var index := 0
 
 @onready var _sprite := $AnimatedSprite2D
 
-func _physics_process(_delta:float)->void:
+func _physics_process(delta:float)->void:
 	if not is_on_floor() or velocity.y > 0.0:
-		velocity.y += GRAVITY
+		velocity.y += GRAVITY * delta
 	
 	if not disabled:
 		_process_actions()
@@ -45,6 +46,8 @@ func _process_actions()->void:
 		velocity.y -= jump_strength
 	if Input.is_action_just_pressed("fire_%d" % index):
 		_fire_bullet()
+	if Input.is_action_just_pressed("frag_%d" % index):
+		_throw_grenade(preload("res://grenades/frag_grenade.tscn").instantiate())
 
 
 func _process_animation()->void:
@@ -63,10 +66,21 @@ func _get_fire_angle() -> float:
 	return roundf(get_angle_to(get_global_mouse_position()) * 8 / TAU) * TAU / 8
 
 
+func _get_launch_position(angle: float) -> Vector2:
+	return global_position + Vector2.from_angle(angle) * 6 + Vector2.UP * 4
+
+
 func _fire_bullet() -> void:
 	var angle := _get_fire_angle()
 	var bullet_velocity := Vector2.from_angle(angle) * bullet_speed
 	var bullet : Bullet = preload("res://projectiles/bullet.tscn").instantiate()
 	bullet.velocity = bullet_velocity
-	bullet.global_position = global_position + Vector2.from_angle(angle) * 6 + Vector2.UP * 4
+	bullet.global_position = _get_launch_position(angle)
 	get_tree().root.add_child(bullet)
+
+
+func _throw_grenade(grenade: RigidBody2D) -> void:
+	var angle := _get_fire_angle()
+	grenade.global_position = _get_launch_position(angle)
+	get_tree().root.add_child(grenade)
+	grenade.apply_central_impulse(Vector2.from_angle(angle) * grenade_speed)

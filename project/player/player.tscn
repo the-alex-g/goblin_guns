@@ -60,4 +60,4 @@ texture_filter = 1
 position = Vector2(0, -8)
 sprite_frames = SubResource("SpriteFrames_oul6g")
 animation = &"idle"
-frame_progress = 0.097041555
+frame_progress = 0.4945851

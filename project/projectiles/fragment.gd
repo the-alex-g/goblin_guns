@@ -4,7 +4,7 @@ extends Node2D
 const GRAVITY := 4.0
 
 @export var cast_distance := 2.0
-@export var damping := 0.9
+@export var damping := 0.5
 
 var _damage := 2
 @export var velocity := Vector2.ZERO
