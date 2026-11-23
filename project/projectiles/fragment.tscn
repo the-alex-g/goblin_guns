@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://dghqt2ycs3amf" path="res://projectiles/fragment.gd" id="1_1ak3v"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_saui7"]
-size = Vector2(2, 2)
+size = Vector2(1, 1)
 
 [node name="Fragment" type="Node2D" unique_id=957996210]
 script = ExtResource("1_1ak3v")
