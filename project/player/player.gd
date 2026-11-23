@@ -3,13 +3,15 @@ extends CharacterBody2D
 
 const GRAVITY := 480.0
 
-@export var speed := 80
-@export var slide := Vector2(0.3, 0.1)
-@export var jump_strength := 150
-@export var bullet_speed := 320.0
-@export var grenade_speed := 150.0
 @export var disabled = false
 @export var id := 0
+@export_group("movement")
+@export var speed := 100
+@export var slide := Vector2(0.3, 0.1)
+@export var jump_strength := 200
+@export_group("combat")
+@export var bullet_speed := 320.0
+@export var grenade_speed := 200.0
 
 var _health := 6 :
 	set(value):
@@ -63,7 +65,7 @@ func _is_aiming() -> bool:
 
 func _get_facing() -> int:
 	var dir : int = sign(velocity.x)
-	return 1 if dir == 0 else dir
+	return 2 if dir == 0 else dir * 2
 
 
 func _process_animation()->void:
@@ -73,9 +75,9 @@ func _process_animation()->void:
 		_play_shoot_animation(_get_fire_angle())
 	else:
 		if velocity.x < -0.1:
-			_sprite.scale.x = -1.0
+			_sprite.scale.x = -2.0
 		elif velocity.x > 0.1:
-			_sprite.scale.x = 1.0
+			_sprite.scale.x = 2.0
 		if abs(velocity.x) > 10.0:
 			_sprite.play("run")
 		else:
@@ -87,7 +89,7 @@ func _get_fire_angle() -> float:
 
 
 func _get_launch_position(angle: float) -> Vector2:
-	return global_position + Vector2.from_angle(angle) * 6 + Vector2.UP * 4
+	return global_position + Vector2.from_angle(angle) * 12 + Vector2.UP * 8
 
 
 func _play_shoot_animation(angle: float) -> void:
@@ -95,28 +97,28 @@ func _play_shoot_animation(angle: float) -> void:
 	match index:
 		0:
 			_sprite.play("shoot_level")
-			_sprite.scale.x = -1
+			_sprite.scale.x = -2
 		1:
 			_sprite.play("shoot_slant_up")
-			_sprite.scale.x = -1
+			_sprite.scale.x = -2
 		2:
 			_sprite.play("shoot_up")
 			_sprite.scale.x = _get_facing()
 		3:
 			_sprite.play("shoot_slant_up")
-			_sprite.scale.x = 1
+			_sprite.scale.x = 2
 		4:
 			_sprite.play("shoot_level")
-			_sprite.scale.x = 1
+			_sprite.scale.x = 2
 		5:
 			_sprite.play("shoot_slant_down")
-			_sprite.scale.x = 1
+			_sprite.scale.x = 2
 		6:
 			_sprite.play("shoot_down")
 			_sprite.scale.x = _get_facing()
 		7:
 			_sprite.play("shoot_slant_down")
-			_sprite.scale.x = -1
+			_sprite.scale.x = -2
 
 
 func _fire_bullet() -> void:
@@ -126,7 +128,6 @@ func _fire_bullet() -> void:
 	bullet.velocity = bullet_velocity
 	bullet.global_position = _get_launch_position(angle)
 	get_tree().root.add_child(bullet)
-	_play_shoot_animation(angle)
 
 
 func _play_special_animation(anim_name: String) -> void:
