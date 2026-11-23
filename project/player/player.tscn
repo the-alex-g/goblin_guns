@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://d1u3utenlng3j" path="res://player/player.png" id="2_rkbax"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_saui7"]
-size = Vector2(5, 8)
+size = Vector2(4, 8)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_g1dw6"]
 atlas = ExtResource("2_rkbax")
@@ -48,10 +48,11 @@ animations = [{
 }]
 
 [node name="Player" type="CharacterBody2D" unique_id=1037376385]
+collision_layer = 2
 script = ExtResource("1_oul6g")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1702218849]
-position = Vector2(-0.5, -4)
+position = Vector2(0, -4)
 shape = SubResource("RectangleShape2D_saui7")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1557501996]
@@ -59,4 +60,4 @@ texture_filter = 1
 position = Vector2(0, -8)
 sprite_frames = SubResource("SpriteFrames_oul6g")
 animation = &"idle"
-frame_progress = 0.8296108
+frame_progress = 0.45162952

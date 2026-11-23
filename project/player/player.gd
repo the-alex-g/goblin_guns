@@ -6,6 +6,7 @@ const GRAVITY := 8.0
 @export var speed := 80
 @export var slide := Vector2(0.3, 0.1)
 @export var jump_strength := 150
+@export var bullet_speed := 320.0
 @export var disabled = false
 @export var index := 0
 
@@ -40,8 +41,10 @@ func _process_actions()->void:
 	
 	velocity.x = lerp(velocity.x, movement, slide.y)
 	
-	if Input.is_action_just_pressed("jump_" + str(index)) and is_on_floor():
+	if Input.is_action_just_pressed("jump_%d" % index) and is_on_floor():
 		velocity.y -= jump_strength
+	if Input.is_action_just_pressed("fire_%d" % index):
+		_fire_bullet()
 
 
 func _process_animation()->void:
@@ -54,3 +57,17 @@ func _process_animation()->void:
 		_sprite.play("run")
 	else:
 		_sprite.play("idle")
+
+
+func _get_fire_angle() -> float:
+	return roundf(get_angle_to(get_global_mouse_position()) * 8 / TAU) * TAU / 8
+
+
+func _fire_bullet() -> void:
+	var angle := _get_fire_angle()
+	var bullet_velocity := Vector2.from_angle(angle) * bullet_speed
+	print(bullet_velocity)
+	var bullet : Bullet = preload("res://bullet/bullet.tscn").instantiate()
+	bullet.velocity = bullet_velocity
+	get_tree().root.add_child(bullet)
+	bullet.global_position = global_position + Vector2.from_angle(angle) * 4 + Vector2.UP * 4
