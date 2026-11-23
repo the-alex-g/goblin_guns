@@ -66,8 +66,7 @@ func _get_fire_angle() -> float:
 func _fire_bullet() -> void:
 	var angle := _get_fire_angle()
 	var bullet_velocity := Vector2.from_angle(angle) * bullet_speed
-	print(bullet_velocity)
-	var bullet : Bullet = preload("res://bullet/bullet.tscn").instantiate()
+	var bullet : Bullet = preload("res://projectiles/bullet.tscn").instantiate()
 	bullet.velocity = bullet_velocity
+	bullet.global_position = global_position + Vector2.from_angle(angle) * 6 + Vector2.UP * 4
 	get_tree().root.add_child(bullet)
-	bullet.global_position = global_position + Vector2.from_angle(angle) * 4 + Vector2.UP * 4

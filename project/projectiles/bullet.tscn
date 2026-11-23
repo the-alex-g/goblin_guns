@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://dg31fvtvi5r2x"]
+
+[ext_resource type="Script" uid="uid://doeqq41esdv2l" path="res://projectiles/bullet.gd" id="1_a3dlt"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_saui7"]
+size = Vector2(2, 2)
+
+[node name="Bullet" type="Area2D" unique_id=749221688]
+collision_layer = 4
+collision_mask = 3
+script = ExtResource("1_a3dlt")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=683224330]
+shape = SubResource("RectangleShape2D_saui7")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

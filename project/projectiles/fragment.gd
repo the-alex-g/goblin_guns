@@ -1,4 +1,4 @@
-class_name Bullet
+class_name Fragment
 extends Node2D
 
 const GRAVITY := 4.0
