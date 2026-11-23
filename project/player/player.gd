@@ -54,6 +54,11 @@ func _is_aiming() -> bool:
 	return true
 
 
+func _get_facing() -> int:
+	var dir : int = sign(velocity.x)
+	return 1 if dir == 0 else dir
+
+
 func _process_animation()->void:
 	if _is_aiming():
 		_play_shoot_animation(_get_fire_angle())
@@ -87,7 +92,7 @@ func _play_shoot_animation(angle: float) -> void:
 			_sprite.scale.x = -1
 		2:
 			_sprite.play("shoot_up")
-			_sprite.scale.x = signf(velocity.x)
+			_sprite.scale.x = _get_facing()
 		3:
 			_sprite.play("shoot_slant_up")
 			_sprite.scale.x = 1
@@ -99,7 +104,7 @@ func _play_shoot_animation(angle: float) -> void:
 			_sprite.scale.x = 1
 		6:
 			_sprite.play("shoot_down")
-			_sprite.scale.x = 1
+			_sprite.scale.x = _get_facing()
 		7:
 			_sprite.play("shoot_slant_down")
 			_sprite.scale.x = -1
