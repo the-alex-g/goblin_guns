@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://lb3otqt5q07p"]
 
 [ext_resource type="Script" uid="uid://dghqt2ycs3amf" path="res://projectiles/fragment.gd" id="1_1ak3v"]
+[ext_resource type="Texture2D" uid="uid://dlomd3e2fl0aw" path="res://projectiles/projectile.png" id="2_h2h75"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_saui7"]
 size = Vector2(2, 2)
@@ -8,6 +9,9 @@ size = Vector2(2, 2)
 [node name="Fragment" type="Node2D" unique_id=957996210]
 script = ExtResource("1_1ak3v")
 cast_distance = 4.0
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1634922881]
+texture = ExtResource("2_h2h75")
 
 [node name="HitArea" type="Area2D" parent="." unique_id=1681541033]
 collision_layer = 4
