@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dx8r7x42l5ilj" path="res://player/player.gd" id="1_oul6g"]
 [ext_resource type="Texture2D" uid="uid://d1u3utenlng3j" path="res://player/player.png" id="2_rkbax"]
+[ext_resource type="Texture2D" uid="uid://byfr0kknuotsq" path="res://player/gunman.png" id="3_g1dw6"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_saui7"]
 size = Vector2(4, 8)
@@ -21,6 +22,26 @@ region = Rect2(16, 0, 16, 16)
 [sub_resource type="AtlasTexture" id="AtlasTexture_g6k8r"]
 atlas = ExtResource("2_rkbax")
 region = Rect2(32, 0, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_boad6"]
+atlas = ExtResource("3_g1dw6")
+region = Rect2(0, 0, 8, 9)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hg6s5"]
+atlas = ExtResource("3_g1dw6")
+region = Rect2(0, 9, 8, 9)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rgyib"]
+atlas = ExtResource("3_g1dw6")
+region = Rect2(8, 0, 8, 9)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8t03j"]
+atlas = ExtResource("3_g1dw6")
+region = Rect2(8, 9, 8, 9)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2ieo8"]
+atlas = ExtResource("3_g1dw6")
+region = Rect2(0, 18, 8, 9)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_oul6g"]
 animations = [{
@@ -45,6 +66,46 @@ animations = [{
 "loop": 1,
 "name": &"run",
 "speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_boad6")
+}],
+"loop": 1,
+"name": &"shoot_down",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hg6s5")
+}],
+"loop": 1,
+"name": &"shoot_level",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rgyib")
+}],
+"loop": 1,
+"name": &"shoot_slant_down",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8t03j")
+}],
+"loop": 1,
+"name": &"shoot_slant_up",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2ieo8")
+}],
+"loop": 1,
+"name": &"shoot_up",
+"speed": 5.0
 }]
 
 [node name="Player" type="CharacterBody2D" unique_id=1037376385]
@@ -57,7 +118,7 @@ shape = SubResource("RectangleShape2D_saui7")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1557501996]
 texture_filter = 1
-position = Vector2(0, -8)
+position = Vector2(0, -4.5)
 sprite_frames = SubResource("SpriteFrames_oul6g")
-animation = &"idle"
-frame_progress = 0.4945851
+animation = &"shoot_up"
+offset = Vector2(2, 0)

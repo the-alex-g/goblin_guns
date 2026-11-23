@@ -9,7 +9,7 @@ const GRAVITY := 480.0
 @export var bullet_speed := 320.0
 @export var grenade_speed := 150.0
 @export var disabled = false
-@export var index := 0
+@export var id := 0
 
 @onready var _sprite := $AnimatedSprite2D
 
@@ -30,8 +30,8 @@ func _physics_process(delta:float)->void:
 
 
 func _get_movement_axis() -> float:
-	var axis := Input.get_joy_axis(index, JOY_AXIS_LEFT_X)
-	if axis == 0 and index == 0:
+	var axis := Input.get_joy_axis(id, JOY_AXIS_LEFT_X)
+	if axis == 0 and id == 0:
 		axis = Input.get_axis("left", "right")
 	return axis
 
@@ -42,24 +42,30 @@ func _process_actions()->void:
 	
 	velocity.x = lerp(velocity.x, movement, slide.y)
 	
-	if Input.is_action_just_pressed("jump_%d" % index) and is_on_floor():
+	if Input.is_action_just_pressed("jump_%d" % id) and is_on_floor():
 		velocity.y -= jump_strength
-	if Input.is_action_just_pressed("fire_%d" % index):
+	if Input.is_action_just_pressed("fire_%d" % id):
 		_fire_bullet()
-	if Input.is_action_just_pressed("frag_%d" % index):
+	if Input.is_action_just_pressed("frag_%d" % id):
 		_throw_grenade(preload("res://grenades/frag_grenade.tscn").instantiate())
 
 
+func _is_aiming() -> bool:
+	return true
+
+
 func _process_animation()->void:
-	if velocity.x < -0.1:
-		_sprite.scale.x = -1.0
-	elif velocity.x > 0.1:
-		_sprite.scale.x = 1.0
-	
-	if abs(velocity.x) > 10.0:
-		_sprite.play("run")
+	if _is_aiming():
+		_play_shoot_animation(_get_fire_angle())
 	else:
-		_sprite.play("idle")
+		if velocity.x < -0.1:
+			_sprite.scale.x = -1.0
+		elif velocity.x > 0.1:
+			_sprite.scale.x = 1.0
+		if abs(velocity.x) > 10.0:
+			_sprite.play("run")
+		else:
+			_sprite.play("idle")
 
 
 func _get_fire_angle() -> float:
@@ -70,6 +76,35 @@ func _get_launch_position(angle: float) -> Vector2:
 	return global_position + Vector2.from_angle(angle) * 6 + Vector2.UP * 4
 
 
+func _play_shoot_animation(angle: float) -> void:
+	var index : int = round(angle * 4 / PI) + 4
+	match index:
+		0:
+			_sprite.play("shoot_level")
+			_sprite.scale.x = -1
+		1:
+			_sprite.play("shoot_slant_up")
+			_sprite.scale.x = -1
+		2:
+			_sprite.play("shoot_up")
+			_sprite.scale.x = signf(velocity.x)
+		3:
+			_sprite.play("shoot_slant_up")
+			_sprite.scale.x = 1
+		4:
+			_sprite.play("shoot_level")
+			_sprite.scale.x = 1
+		5:
+			_sprite.play("shoot_slant_down")
+			_sprite.scale.x = 1
+		6:
+			_sprite.play("shoot_down")
+			_sprite.scale.x = 1
+		7:
+			_sprite.play("shoot_slant_down")
+			_sprite.scale.x = -1
+
+
 func _fire_bullet() -> void:
 	var angle := _get_fire_angle()
 	var bullet_velocity := Vector2.from_angle(angle) * bullet_speed
@@ -77,6 +112,7 @@ func _fire_bullet() -> void:
 	bullet.velocity = bullet_velocity
 	bullet.global_position = _get_launch_position(angle)
 	get_tree().root.add_child(bullet)
+	_play_shoot_animation(angle)
 
 
 func _throw_grenade(grenade: RigidBody2D) -> void:

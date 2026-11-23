@@ -1,7 +1,7 @@
 extends RigidBody2D
 
 @export var fragment_speed := 100
-@export var fragment_count := 6
+@export var fragment_count := 12
 
 
 func _on_timer_timeout() -> void:
