@@ -9,6 +9,7 @@ const GRAVITY := 480.0
 @export var speed := 100
 @export var slide := Vector2(0.3, 0.1)
 @export var jump_strength := 200
+@export var anim_damping := 0.1
 @export_group("combat")
 @export var bullet_speed := 320.0
 @export var grenade_speed := 200.0
@@ -74,9 +75,9 @@ func _process_animation()->void:
 	if _is_aiming():
 		_play_shoot_animation(_get_fire_angle())
 	else:
-		if velocity.x < -0.1:
+		if velocity.x < -anim_damping:
 			_sprite.scale.x = -2.0
-		elif velocity.x > 0.1:
+		elif velocity.x > anim_damping:
 			_sprite.scale.x = 2.0
 		if abs(velocity.x) > 10.0:
 			_sprite.play("run")
@@ -92,32 +93,36 @@ func _get_launch_position(angle: float) -> Vector2:
 	return global_position + Vector2.from_angle(angle) * 12 + Vector2.UP * 8
 
 
+func _play_shoot_anim_by_name(base: String) -> void:
+	_sprite.play("shoot_%s%s" % [base, "" if abs(velocity.x) < anim_damping else "_run"])
+
+
 func _play_shoot_animation(angle: float) -> void:
 	var index : int = round(angle * 4 / PI) + 4
 	match index:
 		0:
-			_sprite.play("shoot_level")
+			_play_shoot_anim_by_name("level")
 			_sprite.scale.x = -2
 		1:
-			_sprite.play("shoot_slant_up")
+			_play_shoot_anim_by_name("slant_up")
 			_sprite.scale.x = -2
 		2:
-			_sprite.play("shoot_up")
+			_play_shoot_anim_by_name("up")
 			_sprite.scale.x = _get_facing()
 		3:
-			_sprite.play("shoot_slant_up")
+			_play_shoot_anim_by_name("slant_up")
 			_sprite.scale.x = 2
 		4:
-			_sprite.play("shoot_level")
+			_play_shoot_anim_by_name("level")
 			_sprite.scale.x = 2
 		5:
-			_sprite.play("shoot_slant_down")
+			_play_shoot_anim_by_name("slant_down")
 			_sprite.scale.x = 2
 		6:
-			_sprite.play("shoot_down")
+			_play_shoot_anim_by_name("down")
 			_sprite.scale.x = _get_facing()
 		7:
-			_sprite.play("shoot_slant_down")
+			_play_shoot_anim_by_name("slant_down")
 			_sprite.scale.x = -2
 
 
