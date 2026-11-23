@@ -250,6 +250,17 @@ animations = [{
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_qjkh3"]
 shader = ExtResource("4_qjkh3")
 
+[sub_resource type="Gradient" id="Gradient_boad6"]
+colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_rgyib"]
+gradient = SubResource("Gradient_boad6")
+width = 128
+height = 128
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.8636364, 0.84090906)
+
 [node name="Player" type="CharacterBody2D" unique_id=1037376385]
 collision_layer = 2
 script = ExtResource("1_oul6g")
@@ -271,5 +282,10 @@ material = SubResource("ShaderMaterial_qjkh3")
 position = Vector2(0, -19)
 scale = Vector2(2, 2)
 texture = ExtResource("4_yw30f")
+
+[node name="PointLight2D" type="PointLight2D" parent="." unique_id=1551508551]
+position = Vector2(0, -8)
+shadow_enabled = true
+texture = SubResource("GradientTexture2D_rgyib")
 
 [connection signal="animation_finished" from="AnimatedSprite2D" to="." method="_on_animated_sprite_2d_animation_finished"]
