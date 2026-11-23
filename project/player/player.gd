@@ -13,7 +13,10 @@ const GRAVITY := 480.0
 @export_group("combat")
 @export var bullet_speed := 320.0
 @export var grenade_speed := 200.0
+@export var gun_cooldown := 0.25
+@export var grenade_cooldown := 1.0
 
+var _can_attack := true
 var _health := 6 :
 	set(value):
 		_health = clampi(value, 0, 6)
@@ -46,6 +49,12 @@ func _get_movement_axis() -> float:
 	return axis
 
 
+func _run_cooldown(time: float) -> void:
+	_can_attack = false
+	await get_tree().create_timer(time).timeout
+	_can_attack = true
+
+
 func _process_actions()->void:
 	var axis := _get_movement_axis()
 	var movement := (axis if abs(axis) > 0.25 else 0.0) * speed
@@ -54,9 +63,10 @@ func _process_actions()->void:
 	
 	if Input.is_action_just_pressed("jump_%d" % id) and is_on_floor():
 		velocity.y -= jump_strength
-	if Input.is_action_just_pressed("fire_%d" % id):
+	if Input.is_action_just_pressed("fire_%d" % id) and _can_attack:
 		_fire_bullet()
-	if Input.is_action_just_pressed("frag_%d" % id):
+		_run_cooldown(gun_cooldown)
+	if Input.is_action_just_pressed("frag_%d" % id) and _can_attack:
 		_throw_grenade(preload("res://grenades/frag_grenade.tscn").instantiate())
 
 
@@ -146,6 +156,7 @@ func _throw_grenade(grenade: RigidBody2D) -> void:
 	get_tree().root.add_child(grenade)
 	grenade.apply_central_impulse(Vector2.from_angle(angle) * grenade_speed)
 	_play_special_animation("throw_grenade")
+	_run_cooldown(grenade_cooldown)
 
 
 func hit(amount: int) -> void:
