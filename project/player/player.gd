@@ -11,7 +11,14 @@ const GRAVITY := 480.0
 @export var disabled = false
 @export var id := 0
 
+var _health := 6 :
+	set(value):
+		_health = clampi(value, 0, 6)
+		_healthbar.set_instance_shader_parameter("percent", value / 6.0)
+var _special_animation_playing := false
+
 @onready var _sprite := $AnimatedSprite2D
+@onready var _healthbar := $HealthBar
 
 func _physics_process(delta:float)->void:
 	if not is_on_floor() or velocity.y > 0.0:
@@ -60,6 +67,8 @@ func _get_facing() -> int:
 
 
 func _process_animation()->void:
+	if _special_animation_playing:
+		return
 	if _is_aiming():
 		_play_shoot_animation(_get_fire_angle())
 	else:
@@ -120,8 +129,22 @@ func _fire_bullet() -> void:
 	_play_shoot_animation(angle)
 
 
+func _play_special_animation(anim_name: String) -> void:
+	_sprite.play(anim_name)
+	_special_animation_playing = true
+
+
 func _throw_grenade(grenade: RigidBody2D) -> void:
 	var angle := _get_fire_angle()
 	grenade.global_position = _get_launch_position(angle)
 	get_tree().root.add_child(grenade)
 	grenade.apply_central_impulse(Vector2.from_angle(angle) * grenade_speed)
+	_play_special_animation("throw_grenade")
+
+
+func hit(amount: int) -> void:
+	_health -= amount
+
+
+func _on_animated_sprite_2d_animation_finished() -> void:
+	_special_animation_playing = false

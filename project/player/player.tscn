@@ -3,6 +3,9 @@
 [ext_resource type="Script" uid="uid://dx8r7x42l5ilj" path="res://player/player.gd" id="1_oul6g"]
 [ext_resource type="Texture2D" uid="uid://d1u3utenlng3j" path="res://player/player.png" id="2_rkbax"]
 [ext_resource type="Texture2D" uid="uid://byfr0kknuotsq" path="res://player/gunman.png" id="3_g1dw6"]
+[ext_resource type="Texture2D" uid="uid://bxtallcmb2x3s" path="res://player/gunman_throw.png" id="4_g6k8r"]
+[ext_resource type="Shader" uid="uid://ci7gubnkf44y2" path="res://player/healthbar.gdshader" id="4_qjkh3"]
+[ext_resource type="Texture2D" uid="uid://dwcimsdanpvrv" path="res://player/healthbar.png" id="4_yw30f"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_saui7"]
 size = Vector2(4, 8)
@@ -42,6 +45,26 @@ region = Rect2(8, 9, 8, 9)
 [sub_resource type="AtlasTexture" id="AtlasTexture_2ieo8"]
 atlas = ExtResource("3_g1dw6")
 region = Rect2(0, 18, 8, 9)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ebec5"]
+atlas = ExtResource("4_g6k8r")
+region = Rect2(0, 0, 7, 8)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_yllr7"]
+atlas = ExtResource("4_g6k8r")
+region = Rect2(7, 0, 7, 8)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_kb6p2"]
+atlas = ExtResource("4_g6k8r")
+region = Rect2(0, 8, 7, 8)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_wodsf"]
+atlas = ExtResource("4_g6k8r")
+region = Rect2(7, 8, 7, 8)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_32hag"]
+atlas = ExtResource("4_g6k8r")
+region = Rect2(0, 16, 7, 8)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_oul6g"]
 animations = [{
@@ -106,7 +129,30 @@ animations = [{
 "loop": 1,
 "name": &"shoot_up",
 "speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ebec5")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_yllr7")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_kb6p2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_wodsf")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_32hag")
+}],
+"loop": 0,
+"name": &"throw_grenade",
+"speed": 15.0
 }]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_qjkh3"]
+shader = ExtResource("4_qjkh3")
 
 [node name="Player" type="CharacterBody2D" unique_id=1037376385]
 collision_layer = 2
@@ -120,5 +166,14 @@ shape = SubResource("RectangleShape2D_saui7")
 texture_filter = 1
 position = Vector2(0, -4.5)
 sprite_frames = SubResource("SpriteFrames_oul6g")
-animation = &"shoot_up"
+animation = &"throw_grenade"
+frame = 4
+frame_progress = 1.0
 offset = Vector2(2, 0)
+
+[node name="HealthBar" type="Sprite2D" parent="." unique_id=1510108352]
+material = SubResource("ShaderMaterial_qjkh3")
+position = Vector2(0, -10)
+texture = ExtResource("4_yw30f")
+
+[connection signal="animation_finished" from="AnimatedSprite2D" to="." method="_on_animated_sprite_2d_animation_finished"]

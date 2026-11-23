@@ -37,6 +37,6 @@ func _bounce() -> void:
 		queue_free()
 
 
-func _on_body_entered(body: Node2D) -> void:
+func _on_hit_area_body_entered(body: Node2D) -> void:
 	if body.has_method("hit"):
 		body.hit(_damage)
