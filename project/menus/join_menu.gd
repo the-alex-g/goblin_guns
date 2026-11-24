@@ -13,6 +13,14 @@ func _input(event: InputEvent) -> void:
 				_start_game()
 		else:
 			_add_player(event.device)
+	elif event is InputEventKey and event.is_pressed():
+		if _has_player(0):
+			if event.key_label == KEY_ENTER:
+				_start_game()
+			elif event.key_label == KEY_ESCAPE:
+				_remove_player(0)
+		else:
+			_add_player(0)
 
 
 func _has_player(id: int) -> bool:
