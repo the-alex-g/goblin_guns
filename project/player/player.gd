@@ -156,6 +156,15 @@ func _play_shoot_animation(angle: float) -> void:
 		print("invalid index: %d" % index)
 
 
+func _add_muzzle_flash(angle: float) -> void:
+	var anim_name := _get_shoot_anim_name(angle)
+	var flash := preload("res://player/muzzle_burst.tscn").instantiate()
+	flash.global_position = global_position
+	flash.anim_name = anim_name
+	flash.scale.x = signi(_sprite.scale.x)
+	get_tree().root.add_child(flash)
+
+
 func _fire_bullet() -> void:
 	var angle := _get_fire_angle()
 	var bullet_velocity := Vector2.from_angle(angle) * bullet_speed
@@ -163,6 +172,7 @@ func _fire_bullet() -> void:
 	bullet.velocity = bullet_velocity
 	bullet.global_position = _get_launch_position(angle)
 	get_tree().root.add_child(bullet)
+	_add_muzzle_flash(angle)
 
 
 func _play_special_animation(anim_name: String) -> void:
