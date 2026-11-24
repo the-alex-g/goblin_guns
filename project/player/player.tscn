@@ -274,7 +274,7 @@ texture_filter = 1
 position = Vector2(-1, -9)
 scale = Vector2(2, 2)
 sprite_frames = SubResource("SpriteFrames_oul6g")
-animation = &"shoot_up_run"
+animation = &"shoot_slant_down"
 offset = Vector2(2, 0)
 
 [node name="HealthBar" type="Sprite2D" parent="." unique_id=1510108352]

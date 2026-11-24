@@ -13,8 +13,8 @@ const GRAVITY := 480.0
 @export_group("combat")
 @export var bullet_speed := 320.0
 @export var grenade_speed := 200.0
-@export var gun_cooldown := 0.25
-@export var grenade_cooldown := 1.0
+@export var gun_cooldown := 0.15
+@export var grenade_cooldown := 0.75
 
 var _can_attack := true
 var _health := 6 :
@@ -57,20 +57,26 @@ func _run_cooldown(time: float) -> void:
 	_can_attack = true
 
 
+func _is_action_pressed(action_name: String, button: JoyButton) -> bool:
+	if id == 0 and Input.is_action_pressed(action_name):
+		return true
+	return Input.is_joy_button_pressed(id, button)
+
+
 func _process_actions()->void:
 	var axis := _get_movement_axis()
 	var movement := (axis if abs(axis) > 0.25 else 0.0) * speed
 	
 	velocity.x = lerp(velocity.x, movement, slide.y)
 	
-	if Input.is_action_just_pressed("jump_%d" % id) and is_on_floor():
+	if _is_action_pressed("jump", JoyButton.JOY_BUTTON_A) and is_on_floor():
 		velocity.y -= jump_strength
-	if Input.is_action_just_pressed("fire_%d" % id) and _can_attack:
+	if _is_action_pressed("fire", JoyButton.JOY_BUTTON_X) and _can_attack:
 		_fire_bullet()
 		_run_cooldown(gun_cooldown)
-	if Input.is_action_just_pressed("frag_%d" % id) and _can_attack:
+	if _is_action_pressed("frag", JoyButton.JOY_BUTTON_B) and _can_attack:
 		_throw_grenade(preload("res://grenades/frag_grenade.tscn").instantiate())
-	var sneaking := Input.is_action_pressed("sneak_%d" % id)
+	var sneaking := _is_action_pressed("sneak", JoyButton.JOY_BUTTON_PADDLE2)
 	if sneaking and _light_on:
 		_light_on = false
 		get_tree().create_tween().tween_property(_light, "energy", 0.0, 0.25).from_current().set_trans(Tween.TRANS_QUAD)
