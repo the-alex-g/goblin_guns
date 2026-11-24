@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dsp2rui30e6vk"
-path="res://.godot/imported/gunman_run.png-0ab7b77d0a8ec86989e2c7e8023cb68a.ctex"
+uid="uid://byfr0kknuotsq"
+path="res://.godot/imported/gunman.png-1773d8546e5aca8bf4f96e6f05768322.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://player/gunman_run.png"
-dest_files=["res://.godot/imported/gunman_run.png-0ab7b77d0a8ec86989e2c7e8023cb68a.ctex"]
+source_file="res://player/textures/gunman.png"
+dest_files=["res://.godot/imported/gunman.png-1773d8546e5aca8bf4f96e6f05768322.ctex"]
 
 [params]
 

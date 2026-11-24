@@ -30,6 +30,16 @@ color = Color(0.22670749, 0.22670749, 0.22670746, 1)
 
 [node name="Player" parent="." unique_id=1037376385 instance=ExtResource("1_53q0u")]
 position = Vector2(19, 12)
+disabled = null
+id = null
+speed = null
+slide = null
+jump_strength = null
+anim_damping = null
+bullet_speed = null
+grenade_speed = null
+gun_cooldown = null
+grenade_cooldown = null
 
 [node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=515293565]
 self_modulate = Color(0, 0, 0, 1)

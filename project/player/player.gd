@@ -22,9 +22,11 @@ var _health := 6 :
 		_health = clampi(value, 0, 6)
 		_healthbar.set_instance_shader_parameter("percent", value / 6.0)
 var _special_animation_playing := false
+var _light_on := true
 
 @onready var _sprite := $AnimatedSprite2D
 @onready var _healthbar := $HealthBar
+@onready var _light := $PointLight2D
 
 func _physics_process(delta:float)->void:
 	if not is_on_floor() or velocity.y > 0.0:
@@ -68,6 +70,13 @@ func _process_actions()->void:
 		_run_cooldown(gun_cooldown)
 	if Input.is_action_just_pressed("frag_%d" % id) and _can_attack:
 		_throw_grenade(preload("res://grenades/frag_grenade.tscn").instantiate())
+	var sneaking := Input.is_action_pressed("sneak_%d" % id)
+	if sneaking and _light_on:
+		_light_on = false
+		get_tree().create_tween().tween_property(_light, "energy", 0.0, 0.25).from_current().set_trans(Tween.TRANS_QUAD)
+	elif not sneaking and not _light_on:
+		_light_on = true
+		get_tree().create_tween().tween_property(_light, "energy", 1.0, 0.25).from_current().set_trans(Tween.TRANS_QUAD)
 
 
 func _is_aiming() -> bool:
