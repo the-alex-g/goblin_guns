@@ -5,9 +5,8 @@ extends RigidBody2D
 
 
 func _on_timer_timeout() -> void:
-	var offset := PI * randf()
 	for i : int in fragment_count:
-		var angle := offset + TAU * i / fragment_count
+		var angle := randf() * TAU
 		var fragment : Fragment = preload("res://projectiles/fragment.tscn").instantiate()
 		fragment.velocity = Vector2.from_angle(angle) * fragment_speed
 		fragment.global_position = global_position
