@@ -63,6 +63,12 @@ func _is_action_pressed(action_name: String, button: JoyButton) -> bool:
 	return Input.is_joy_button_pressed(id, button)
 
 
+func _is_sneaking() -> float:
+	if id == 0 and Input.is_action_pressed("sneak"):
+		return true
+	return Input.get_joy_axis(id, JOY_AXIS_TRIGGER_LEFT) > 0.5
+
+
 func _process_actions()->void:
 	var axis := _get_movement_axis()
 	var movement := (axis if abs(axis) > 0.25 else 0.0) * speed
@@ -71,11 +77,11 @@ func _process_actions()->void:
 	
 	if _is_action_pressed("jump", JoyButton.JOY_BUTTON_A) and is_on_floor():
 		velocity.y -= jump_strength
-	if _is_action_pressed("fire", JoyButton.JOY_BUTTON_X) and _can_attack:
+	if _is_action_pressed("fire", JoyButton.JOY_BUTTON_LEFT_SHOULDER) and _can_attack:
 		_fire_bullet()
-	if _is_action_pressed("frag", JoyButton.JOY_BUTTON_B) and _can_attack:
+	if _is_action_pressed("frag", JoyButton.JOY_BUTTON_RIGHT_SHOULDER) and _can_attack:
 		_throw_grenade(preload("res://grenades/frag_grenade.tscn").instantiate())
-	var sneaking := _is_action_pressed("sneak", JoyButton.JOY_BUTTON_PADDLE2)
+	var sneaking := _is_sneaking()
 	if sneaking and _light_on:
 		_light_on = false
 		get_tree().create_tween().tween_property(_light, "energy", 0.0, 0.25).from_current().set_trans(Tween.TRANS_QUAD)
@@ -84,8 +90,17 @@ func _process_actions()->void:
 		get_tree().create_tween().tween_property(_light, "energy", 1.0, 0.25).from_current().set_trans(Tween.TRANS_QUAD)
 
 
+func _get_controller_aim() -> Vector2:
+	var x_axis := Input.get_joy_axis(id, JOY_AXIS_RIGHT_X)
+	var y_axis := Input.get_joy_axis(id, JOY_AXIS_RIGHT_Y)
+	return Vector2(
+		x_axis if abs(x_axis) > 0.1 else 0.0,
+		y_axis if abs(y_axis) > 0.1 else 0.0
+	)
+
+
 func _is_aiming() -> bool:
-	return true
+	return id == 0 or _get_controller_aim() != Vector2.ZERO
 
 
 func _get_facing() -> int:
@@ -110,7 +125,10 @@ func _process_animation()->void:
 
 
 func _get_fire_angle() -> float:
-	return roundf(get_angle_to(get_global_mouse_position()) * 8 / TAU) * TAU / 8
+	var controller_aim := _get_controller_aim()
+	if controller_aim == Vector2.ZERO and id == 0:
+		return roundf(get_angle_to(get_global_mouse_position()) * 8 / TAU) * TAU / 8
+	return controller_aim.angle()
 
 
 func _get_launch_position(angle: float) -> Vector2:

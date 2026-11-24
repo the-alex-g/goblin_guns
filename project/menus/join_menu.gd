@@ -21,10 +21,12 @@ func _has_player(id: int) -> bool:
 
 func _add_player(id: int) -> void:
 	_joined_players.append(id)
+	print("player %d joined" % id)
 
 
 func _remove_player(id: int) -> void:
 	_joined_players.erase(id)
+	print("player %d left" % id)
 
 
 func _start_game() -> void:
