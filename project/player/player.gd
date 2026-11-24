@@ -2,6 +2,7 @@ class_name Player
 extends CharacterBody2D
 
 const GRAVITY := 480.0
+const ANIM_NAMES : PackedStringArray = ["level", "slant_up", "up", "slant_up", "level", "slant_down", "down", "slant_down", "level"]
 
 @export var disabled := false
 @export var id := 0
@@ -137,23 +138,9 @@ func _get_shoot_index() -> int:
 
 
 func _get_shoot_anim_name() -> String:
-	match _get_shoot_index():
-		0, 8:
-			return "level"
-		1:
-			return "slant_up"
-		2:
-			return "up"
-		3:
-			return "slant_up"
-		4:
-			return "level"
-		5:
-			return "slant_down"
-		6:
-			return "down"
-		7:
-			return "slant_down"
+	var index := _get_shoot_index()
+	if index >= 0 and index <= 8:
+		return ANIM_NAMES[index]
 	return ""
 
 
