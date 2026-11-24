@@ -73,7 +73,6 @@ func _process_actions()->void:
 		velocity.y -= jump_strength
 	if _is_action_pressed("fire", JoyButton.JOY_BUTTON_X) and _can_attack:
 		_fire_bullet()
-		_run_cooldown(gun_cooldown)
 	if _is_action_pressed("frag", JoyButton.JOY_BUTTON_B) and _can_attack:
 		_throw_grenade(preload("res://grenades/frag_grenade.tscn").instantiate())
 	var sneaking := _is_action_pressed("sneak", JoyButton.JOY_BUTTON_PADDLE2)
@@ -179,6 +178,7 @@ func _fire_bullet() -> void:
 	bullet.global_position = _get_launch_position(angle)
 	get_tree().root.add_child(bullet)
 	_add_muzzle_flash(angle)
+	_run_cooldown(gun_cooldown)
 
 
 func _play_special_animation(anim_name: String) -> void:
