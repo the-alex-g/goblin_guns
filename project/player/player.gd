@@ -116,33 +116,44 @@ func _play_shoot_anim_by_name(base: String) -> void:
 	_sprite.play("shoot_%s%s" % [base, "" if abs(velocity.x) < anim_damping else "_run"])
 
 
-func _play_shoot_animation(angle: float) -> void:
-	var index : int = round(angle * 4 / PI) + 4
-	match index:
-		0:
-			_play_shoot_anim_by_name("level")
-			_sprite.scale.x = -2
+func _get_shoot_index(angle: float) -> int:
+	return round(angle * 4 / PI) + 4
+
+
+func _get_shoot_anim_name(angle: float) -> String:
+	match _get_shoot_index(angle):
+		0, 8:
+			return "level"
 		1:
-			_play_shoot_anim_by_name("slant_up")
-			_sprite.scale.x = -2
+			return "slant_up"
 		2:
-			_play_shoot_anim_by_name("up")
-			_sprite.scale.x = _get_facing()
+			return "up"
 		3:
-			_play_shoot_anim_by_name("slant_up")
-			_sprite.scale.x = 2
+			return "slant_up"
 		4:
-			_play_shoot_anim_by_name("level")
-			_sprite.scale.x = 2
+			return "level"
 		5:
-			_play_shoot_anim_by_name("slant_down")
-			_sprite.scale.x = 2
+			return "slant_down"
 		6:
-			_play_shoot_anim_by_name("down")
-			_sprite.scale.x = _get_facing()
+			return "down"
 		7:
-			_play_shoot_anim_by_name("slant_down")
+			return "slant_down"
+	return ""
+
+
+func _play_shoot_animation(angle: float) -> void:
+	var anim_name := _get_shoot_anim_name(angle)
+	var index : int = _get_shoot_index(angle)
+	if anim_name != "":
+		_play_shoot_anim_by_name(anim_name)
+		if index <= 1 or index >= 7:
 			_sprite.scale.x = -2
+		elif index == 2 or index == 6:
+			_sprite.scale.x = _get_facing()
+		else:
+			_sprite.scale.x = 2
+	else:
+		print("invalid index: %d" % index)
 
 
 func _fire_bullet() -> void:
