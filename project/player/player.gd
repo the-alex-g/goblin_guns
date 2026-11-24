@@ -3,18 +3,22 @@ extends CharacterBody2D
 
 const GRAVITY := 480.0
 
-@export var disabled = false
+@export var disabled := false
 @export var id := 0
+@export var mouse_aim := false :
+	get:
+		return mouse_aim and id == 0
 @export_group("movement")
 @export var speed := 100
 @export var slide := Vector2(0.3, 0.1)
 @export var jump_strength := 200
-@export var anim_damping := 0.1
+@export var anim_damping := 10.0
 @export_group("combat")
 @export var bullet_speed := 320.0
 @export var grenade_speed := 200.0
 @export var gun_cooldown := 0.15
 @export var grenade_cooldown := 0.75
+@export var knockback := 5.0
 
 var _can_attack := true
 var _health := 6 :
@@ -23,6 +27,7 @@ var _health := 6 :
 		_healthbar.set_instance_shader_parameter("percent", value / 6.0)
 var _special_animation_playing := false
 var _light_on := true
+var _aim_angle := 0.0
 
 @onready var _sprite := $AnimatedSprite2D
 @onready var _healthbar := $HealthBar
@@ -37,7 +42,10 @@ func _physics_process(delta:float)->void:
 	else:
 		velocity.x = lerp(velocity.x, 0.0, slide.x)
 	
-	_process_animation()
+	_update_aim_angle()
+	
+	if not _special_animation_playing:
+		_play_shoot_animation()
 	
 	move_and_slide()
 	
@@ -94,13 +102,9 @@ func _get_controller_aim() -> Vector2:
 	var x_axis := Input.get_joy_axis(id, JOY_AXIS_RIGHT_X)
 	var y_axis := Input.get_joy_axis(id, JOY_AXIS_RIGHT_Y)
 	return Vector2(
-		x_axis if abs(x_axis) > 0.1 else 0.0,
-		y_axis if abs(y_axis) > 0.1 else 0.0
+		x_axis if abs(x_axis) > 0.4 else 0.0,
+		y_axis if abs(y_axis) > 0.4 else 0.0
 	)
-
-
-func _is_aiming() -> bool:
-	return id == 0 or _get_controller_aim() != Vector2.ZERO
 
 
 func _get_facing() -> int:
@@ -108,43 +112,32 @@ func _get_facing() -> int:
 	return 2 if dir == 0 else dir * 2
 
 
-func _process_animation()->void:
-	if _special_animation_playing:
-		return
-	if _is_aiming():
-		_play_shoot_animation(_get_fire_angle())
-	else:
-		if velocity.x < -anim_damping:
-			_sprite.scale.x = -2.0
-		elif velocity.x > anim_damping:
-			_sprite.scale.x = 2.0
-		if abs(velocity.x) > 10.0:
-			_sprite.play("run")
-		else:
-			_sprite.play("idle")
+func _clamp_angle(angle: float) -> float:
+	return roundf(angle * 8 / TAU) * TAU / 8
 
 
-func _get_fire_angle() -> float:
+func _update_aim_angle() -> void:
 	var controller_aim := _get_controller_aim()
-	if controller_aim == Vector2.ZERO and id == 0:
-		return roundf(get_angle_to(get_global_mouse_position()) * 8 / TAU) * TAU / 8
-	return controller_aim.angle()
+	if controller_aim == Vector2.ZERO and mouse_aim:
+		_aim_angle = _clamp_angle(get_angle_to(get_global_mouse_position()))
+	elif controller_aim != Vector2.ZERO:
+		_aim_angle = _clamp_angle(controller_aim.angle())
 
 
-func _get_launch_position(angle: float) -> Vector2:
-	return global_position + Vector2.from_angle(angle) * 12 + Vector2.UP * 8
+func _get_launch_position() -> Vector2:
+	return global_position + Vector2.from_angle(_aim_angle) * 12 + Vector2.UP * 8
 
 
 func _play_shoot_anim_by_name(base: String) -> void:
 	_sprite.play("shoot_%s%s" % [base, "" if abs(velocity.x) < anim_damping else "_run"])
 
 
-func _get_shoot_index(angle: float) -> int:
-	return round(angle * 4 / PI) + 4
+func _get_shoot_index() -> int:
+	return round(_aim_angle * 4 / PI) + 4
 
 
-func _get_shoot_anim_name(angle: float) -> String:
-	match _get_shoot_index(angle):
+func _get_shoot_anim_name() -> String:
+	match _get_shoot_index():
 		0, 8:
 			return "level"
 		1:
@@ -164,9 +157,9 @@ func _get_shoot_anim_name(angle: float) -> String:
 	return ""
 
 
-func _play_shoot_animation(angle: float) -> void:
-	var anim_name := _get_shoot_anim_name(angle)
-	var index : int = _get_shoot_index(angle)
+func _play_shoot_animation() -> void:
+	var anim_name := _get_shoot_anim_name()
+	var index : int = _get_shoot_index()
 	if anim_name != "":
 		_play_shoot_anim_by_name(anim_name)
 		if index <= 1 or index >= 7:
@@ -179,8 +172,8 @@ func _play_shoot_animation(angle: float) -> void:
 		print("invalid index: %d" % index)
 
 
-func _add_muzzle_flash(angle: float) -> void:
-	var anim_name := _get_shoot_anim_name(angle)
+func _add_muzzle_flash() -> void:
+	var anim_name := _get_shoot_anim_name()
 	var flash := preload("res://player/muzzle_burst.tscn").instantiate()
 	flash.global_position = global_position
 	flash.anim_name = anim_name
@@ -189,14 +182,14 @@ func _add_muzzle_flash(angle: float) -> void:
 
 
 func _fire_bullet() -> void:
-	var angle := _get_fire_angle()
-	var bullet_velocity := Vector2.from_angle(angle) * bullet_speed
+	var bullet_velocity := Vector2.from_angle(_aim_angle) * bullet_speed
 	var bullet : Bullet = preload("res://projectiles/bullet.tscn").instantiate()
 	bullet.velocity = bullet_velocity
-	bullet.global_position = _get_launch_position(angle)
+	bullet.global_position = _get_launch_position()
 	get_tree().root.add_child(bullet)
-	_add_muzzle_flash(angle)
+	_add_muzzle_flash()
 	_run_cooldown(gun_cooldown)
+	velocity -= Vector2.from_angle(_aim_angle) * knockback
 
 
 func _play_special_animation(anim_name: String) -> void:
@@ -205,10 +198,9 @@ func _play_special_animation(anim_name: String) -> void:
 
 
 func _throw_grenade(grenade: RigidBody2D) -> void:
-	var angle := _get_fire_angle()
-	grenade.global_position = _get_launch_position(angle)
+	grenade.global_position = _get_launch_position()
 	get_tree().root.add_child(grenade)
-	grenade.apply_central_impulse(Vector2.from_angle(angle) * grenade_speed)
+	grenade.apply_central_impulse(Vector2.from_angle(_aim_angle) * grenade_speed)
 	_play_special_animation("throw_grenade")
 	_run_cooldown(grenade_cooldown)
 
