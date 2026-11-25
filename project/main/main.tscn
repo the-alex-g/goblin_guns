@@ -21,13 +21,12 @@ sources/0 = SubResource("TileSetAtlasSource_xwkvk")
 
 [node name="Main" type="Node2D" unique_id=1247647158]
 script = ExtResource("1_xwkvk")
-apply_shadow = false
 
 [node name="ColorRect" type="ColorRect" parent="." unique_id=2040054560]
-offset_left = -7.0
-offset_top = -6.0
-offset_right = 653.0
-offset_bottom = 331.0
+offset_left = -16.0
+offset_top = -24.0
+offset_right = 672.0
+offset_bottom = 424.0
 color = Color(0.22670749, 0.22670749, 0.22670746, 1)
 
 [node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=515293565]
@@ -40,17 +39,3 @@ tile_set = SubResource("TileSet_saui7")
 [node name="CanvasModulate" type="CanvasModulate" parent="." unique_id=2021254584]
 visible = false
 color = Color(0, 0, 0, 1)
-
-[node name="PlayerSpawns" type="Node2D" parent="." unique_id=432966009]
-
-[node name="Marker2D" type="Marker2D" parent="PlayerSpawns" unique_id=1675749194]
-position = Vector2(64, 32)
-
-[node name="Marker2D2" type="Marker2D" parent="PlayerSpawns" unique_id=1869673183]
-position = Vector2(96, 160)
-
-[node name="Marker2D3" type="Marker2D" parent="PlayerSpawns" unique_id=761182422]
-position = Vector2(512, 248)
-
-[node name="Marker2D4" type="Marker2D" parent="PlayerSpawns" unique_id=829941935]
-position = Vector2(504, 120)

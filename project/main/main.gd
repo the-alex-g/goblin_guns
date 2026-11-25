@@ -6,25 +6,28 @@ extends Node2D
 var players : Array[int] = [0]
 var _rooms : Array[Array] = []
 var _stairs : Array[Array] = []
+var _spawns : Array[Vector2i] = []
 
 @onready var _player_container := $PlayerContainer
 @onready var _darkness_layer := $CanvasModulate
-@onready var _player_spawn_locations := $PlayerSpawns
 @onready var _tile_layer := $TileMapLayer
 
 
 func _ready() -> void:
+	_darkness_layer.visible = apply_shadow
+	_load_rooms_from_dir("rooms", _rooms)
+	_load_rooms_from_dir("stairs", _stairs)
+	_build_complex()
 	for id in players:
 		var player := preload("res://player/player.tscn").instantiate()
 		player.id = id
-		player.position = _player_spawn_locations.get_child(id).position
+		player.position = _spawns.pick_random() * 8
 		_player_container.add_child(player)
-	_darkness_layer.visible = apply_shadow
-	_rooms.append(_load_room("rooms/stacked_corridors"))
-	_rooms.append(_load_room("rooms/stacked_rooms"))
-	_rooms.append(_load_room("rooms/large_room"))
-	_stairs.append(_load_room("stairs/basic_staircase"))
-	_build_complex()
+
+
+func _load_rooms_from_dir(dirname: String, destination: Array[Array]) -> void:
+	for filename in DirAccess.get_files_at("res://main/%s/" % dirname):
+		destination.append(_load_room("%s/%s" % [dirname, filename]))
 
 
 func _build_outer_walls() -> void:
@@ -44,10 +47,13 @@ func _build_complex() -> void:
 	_tile_layer.clear()
 	_build_outer_walls()
 	for row in 3:
-		var stair_location := randi_range(0, 4)
+		var stair_location_1 := randi_range(0, 4)
+		var stair_location_2 := randi_range(0, 4)
+		while stair_location_1 == stair_location_2:
+			stair_location_2 = randi_range(0, 4)
 		for column in 5:
 			var offset := Vector2i(column * 16 + 1, row * 16 + 1)
-			if column == stair_location:
+			if column == stair_location_1 or randf() < 0.25 or column == stair_location_2:
 				_build_room(_stairs.pick_random(), offset)
 			else:
 				_build_room(_rooms.pick_random(), offset)
@@ -70,6 +76,10 @@ func _get_type(c: String) -> Callable:
 		return func(pos: Vector2i): return _cell_full(pos + Vector2i.RIGHT)
 	elif c == "^":
 		return func(pos: Vector2i): return _cell_full(pos + Vector2i.UP)
+	elif c == "$":
+		return func(pos: Vector2i):
+			_spawns.append(pos)
+			return true
 	else:
 		if c != " ":
 			push_warning("unknown cell type %s" % c)
@@ -77,7 +87,7 @@ func _get_type(c: String) -> Callable:
 
 
 func _load_room(file_name: String) -> Array[Callable]:
-	var file := FileAccess.open("res://main/%s.txt" % file_name, FileAccess.READ)
+	var file := FileAccess.open("res://main/%s" % file_name, FileAccess.READ)
 	var room := []
 	var lines := 0
 	while not file.eof_reached():
@@ -108,6 +118,8 @@ func _load_room(file_name: String) -> Array[Callable]:
 						func(pos: Vector2i):
 							return not _get_type(line[i]).call(pos)
 					)
+				elif c == "/":
+					chars -= 1
 				else:
 					room.append(_get_type(line[i]))
 				i += 1

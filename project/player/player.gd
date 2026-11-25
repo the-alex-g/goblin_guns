@@ -86,9 +86,9 @@ func _process_actions()->void:
 	
 	if _is_action_pressed("jump", JoyButton.JOY_BUTTON_A) and is_on_floor():
 		velocity.y -= jump_strength
-	if _is_action_pressed("fire", JoyButton.JOY_BUTTON_LEFT_SHOULDER) and _can_attack:
+	if _is_action_pressed("fire", JoyButton.JOY_BUTTON_RIGHT_SHOULDER) and _can_attack:
 		_fire_bullet()
-	if _is_action_pressed("frag", JoyButton.JOY_BUTTON_RIGHT_SHOULDER) and _can_attack:
+	if Input.get_joy_axis(id, JOY_AXIS_TRIGGER_RIGHT) > 0.5 and _can_attack:
 		_throw_grenade(preload("res://grenades/frag_grenade.tscn").instantiate())
 	var sneaking := _is_sneaking()
 	if sneaking and _light_on:
