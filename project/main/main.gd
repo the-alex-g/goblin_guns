@@ -32,8 +32,22 @@ func _ready() -> void:
 	_build_complex()
 
 
+func _build_outer_walls() -> void:
+	for x in range(-3, 82):
+		_add_cell(Vector2i(x, -3))
+		_add_cell(Vector2i(x, -1))
+		_add_cell(Vector2i(x, 40))
+		_add_cell(Vector2i(x, 42))
+	for y in range(-3, 42):
+		_add_cell(Vector2i(-3, y))
+		_add_cell(Vector2i(-1, y))
+		_add_cell(Vector2i(80, y))
+		_add_cell(Vector2i(82, y))
+
+
 func _build_complex() -> void:
 	_tile_layer.clear()
+	_build_outer_walls()
 	for row in 3:
 		var stair_location := randi_range(0, 4)
 		for column in 5:
