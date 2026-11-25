@@ -146,10 +146,14 @@ func _load_room(file_name: String, size: int) -> Array[Callable]:
 				var c = line[i]
 				if c == "?":
 					i += 1
-					if randf() < 0.5:
-						room.append(_false)
-					else:
-						room.append(_get_type(line[i]))
+					var next := _get_type(line[i])
+					room.append(
+						func(pos: Vector2i):
+							if randf() < 0.5:
+								return false
+							else:
+								return next.call(pos)
+					)
 				elif c == "!":
 					i += 1
 					room.append(
@@ -162,7 +166,7 @@ func _load_room(file_name: String, size: int) -> Array[Callable]:
 					room.append(_get_type(line[i]))
 				i += 1
 			if chars != size:
-				push_warning("irregular line length %d in %s" % [chars, file_name])
+				push_warning("irregular line length %d in %s line %d" % [chars, file_name, lines])
 				file.close()
 				return []
 	file.close()
