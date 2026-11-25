@@ -1,14 +1,9 @@
 class_name Main
 extends Node2D
 
-enum CellType {WALL, SPACE, N_LEFT, N_RIGHT, UP}
-
 @export var apply_shadow := true
 
 var players : Array[int] = [0]
-var _n_left_cells : PackedVector2Array = []
-var _n_right_cells : PackedVector2Array = []
-var _up_cells : PackedVector2Array = []
 var _rooms : Array[Array] = []
 var _stairs : Array[Array] = []
 
@@ -33,16 +28,16 @@ func _ready() -> void:
 
 
 func _build_outer_walls() -> void:
-	for x in range(-3, 82):
-		_add_cell(Vector2i(x, -3))
-		_add_cell(Vector2i(x, -1))
-		_add_cell(Vector2i(x, 40))
-		_add_cell(Vector2i(x, 42))
-	for y in range(-3, 42):
-		_add_cell(Vector2i(-3, y))
-		_add_cell(Vector2i(-1, y))
-		_add_cell(Vector2i(80, y))
-		_add_cell(Vector2i(82, y))
+	for x in range(-2, 83):
+		_add_cell(Vector2i(x, -2))
+		_add_cell(Vector2i(x, 0))
+		_add_cell(Vector2i(x, 49))
+		_add_cell(Vector2i(x, 51))
+	for y in range(-2, 51):
+		_add_cell(Vector2i(-2, y))
+		_add_cell(Vector2i(0, y))
+		_add_cell(Vector2i(81, y))
+		_add_cell(Vector2i(83, y))
 
 
 func _build_complex() -> void:
@@ -51,30 +46,37 @@ func _build_complex() -> void:
 	for row in 3:
 		var stair_location := randi_range(0, 4)
 		for column in 5:
-			var offset := Vector2i(column * 16, row * 16)
+			var offset := Vector2i(column * 16 + 1, row * 16 + 1)
 			if column == stair_location:
 				_build_room(_stairs.pick_random(), offset)
 			else:
 				_build_room(_rooms.pick_random(), offset)
-	_resolve_conditional_cells()
 
 
-func _get_type(c: String) -> CellType:
+func _false(_pos) -> bool:
+	return false
+
+
+func _true(_pos) -> bool:
+	return true
+
+
+func _get_type(c: String) -> Callable:
 	if c == "#":
-		return CellType.WALL
+		return _true
 	elif c == "<":
-		return CellType.N_LEFT
+		return func(pos: Vector2i): return _cell_full(pos + Vector2i.LEFT)
 	elif c == ">":
-		return CellType.N_RIGHT
+		return func(pos: Vector2i): return _cell_full(pos + Vector2i.RIGHT)
 	elif c == "^":
-		return CellType.UP
+		return func(pos: Vector2i): return _cell_full(pos + Vector2i.UP)
 	else:
 		if c != " ":
 			push_warning("unknown cell type %s" % c)
-		return CellType.SPACE
+		return _false
 
 
-func _load_room(file_name: String) -> Array:
+func _load_room(file_name: String) -> Array[Callable]:
 	var file := FileAccess.open("res://main/%s.txt" % file_name, FileAccess.READ)
 	var room := []
 	var lines := 0
@@ -87,7 +89,7 @@ func _load_room(file_name: String) -> Array:
 				return room
 			else:
 				for i in 16:
-					room.append(CellType.SPACE)
+					room.append(_false)
 		else:
 			var i = 0;
 			var chars = 0
@@ -97,9 +99,15 @@ func _load_room(file_name: String) -> Array:
 				if c == "?":
 					i += 1
 					if randf() < 0.5:
-						room.append(CellType.SPACE)
+						room.append(_false)
 					else:
 						room.append(_get_type(line[i]))
+				elif c == "!":
+					i += 1
+					room.append(
+						func(pos: Vector2i):
+							return not _get_type(line[i]).call(pos)
+					)
 				else:
 					room.append(_get_type(line[i]))
 				i += 1
@@ -121,17 +129,10 @@ func _add_cell(cell: Vector2i) -> void:
 func _build_room(room: Array, offset: Vector2i) -> void:
 	for i in 256:
 		var cell := offset + Vector2i(i % 16, floori(i / 16.0))
-		match room[i]:
-			CellType.WALL:
-				_add_cell(cell)
-			CellType.SPACE:
-				_tile_layer.erase_cell(cell)
-			CellType.N_LEFT:
-				_n_left_cells.append(cell)
-			CellType.N_RIGHT:
-				_n_right_cells.append(cell)
-			CellType.UP:
-				_up_cells.append(cell)
+		if room[i].call(cell):
+			_add_cell(cell)
+		else:
+			_tile_layer.erase_cell(cell)
 
 
 func _cell_full(cell: Vector2i) -> bool:
@@ -140,15 +141,3 @@ func _cell_full(cell: Vector2i) -> bool:
 
 func _cell_empty(cell: Vector2i) -> bool:
 	return not _cell_full(cell)
-
-
-func _resolve_conditional_cells() -> void:
-	for cell : Vector2i in _n_left_cells:
-		if _cell_empty(cell + Vector2i.LEFT):
-			_add_cell(cell)
-	for cell : Vector2i in _n_right_cells:
-		if _cell_empty(cell + Vector2i.RIGHT):
-			_add_cell(cell)
-	for cell : Vector2i in _up_cells:
-		if _cell_full(cell + Vector2i.UP):
-			_add_cell(cell)
