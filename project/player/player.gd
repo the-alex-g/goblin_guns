@@ -24,6 +24,8 @@ const ANIM_NAMES : PackedStringArray = ["level", "slant_up", "up", "slant_up", "
 var _can_attack := true
 var _health := 6 :
 	set(value):
+		if value <= 0:
+			queue_free()
 		_health = clampi(value, 0, 6)
 		_healthbar.set_instance_shader_parameter("percent", value / 6.0)
 var _special_animation_playing := false
@@ -49,8 +51,6 @@ func _physics_process(delta:float)->void:
 		_play_shoot_animation()
 	
 	move_and_slide()
-	
-	position.x = fposmod(position.x, 160)
 
 
 func _get_movement_axis() -> float:
