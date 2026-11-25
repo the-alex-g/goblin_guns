@@ -7,6 +7,9 @@ var players : Array[int] = [0]
 var _rooms : Array[Array] = []
 var _stairs : Array[Array] = []
 var _spawns : Array[Vector2i] = []
+var _decorations : Array[Array] = []
+var _decor_groups := {}
+var _decor_group_index := 0
 
 @onready var _player_container := $PlayerContainer
 @onready var _darkness_layer := $CanvasModulate
@@ -15,8 +18,9 @@ var _spawns : Array[Vector2i] = []
 
 func _ready() -> void:
 	_darkness_layer.visible = apply_shadow
-	_load_rooms_from_dir("rooms", _rooms)
-	_load_rooms_from_dir("stairs", _stairs)
+	_load_features_from_dir("rooms", _rooms)
+	_load_features_from_dir("stairs", _stairs)
+	_load_features_from_dir("decorations", _decorations, 3)
 	_build_complex()
 	for id in players:
 		var player := preload("res://player/player.tscn").instantiate()
@@ -25,9 +29,9 @@ func _ready() -> void:
 		_player_container.add_child(player)
 
 
-func _load_rooms_from_dir(dirname: String, destination: Array[Array]) -> void:
+func _load_features_from_dir(dirname: String, destination: Array[Array], size := 16) -> void:
 	for filename in DirAccess.get_files_at("res://main/%s/" % dirname):
-		destination.append(_load_room("%s/%s" % [dirname, filename]))
+		destination.append(_load_room("%s/%s" % [dirname, filename], size))
 
 
 func _build_outer_walls() -> void:
@@ -53,10 +57,32 @@ func _build_complex() -> void:
 			stair_location_2 = randi_range(0, 4)
 		for column in 5:
 			var offset := Vector2i(column * 16 + 1, row * 16 + 1)
-			if column == stair_location_1 or randf() < 0.25 or column == stair_location_2:
+			if column == stair_location_1 or randf() < 0.1 or column == stair_location_2:
 				_build_room(_stairs.pick_random(), offset)
 			else:
 				_build_room(_rooms.pick_random(), offset)
+	_build_decor()
+
+
+func _build_decor() -> void:
+	for group_id in _decor_groups:
+		if randf() < 0.5:
+			var decor : Array = _decorations.pick_random()
+			for pos in _decor_groups[group_id]:
+				_generate_decor(pos, decor)
+
+
+func _generate_decor(pos: Vector2i, decor: Array) -> void:
+	if _cell_full(pos + Vector2i.DOWN):
+		for i in 9:
+			var cell := pos + Vector2i(i % 3 - 1, floori(i / 3.0) - 2)
+			if decor[i].call(cell):
+				_add_cell(cell)
+	else:
+		for i in 9:
+			var cell := pos + Vector2i(i % 3 - 1, floori(i / 3.0))
+			if decor[8 - i].call(cell):
+				_add_cell(cell)
 
 
 func _false(_pos) -> bool:
@@ -65,6 +91,14 @@ func _false(_pos) -> bool:
 
 func _true(_pos) -> bool:
 	return true
+
+
+func _track_decor(pos: Vector2i, offset: int) -> void:
+	var index := _decor_group_index + offset
+	if _decor_groups.has(index):
+		_decor_groups[index].append(pos)
+	else:
+		_decor_groups[index] = [pos]
 
 
 func _get_type(c: String) -> Callable:
@@ -80,13 +114,17 @@ func _get_type(c: String) -> Callable:
 		return func(pos: Vector2i):
 			_spawns.append(pos)
 			return true
+	elif c.is_valid_int():
+		return func(pos: Vector2i):
+			_track_decor(pos, int(c))
+			return false
 	else:
 		if c != " ":
 			push_warning("unknown cell type %s" % c)
 		return _false
 
 
-func _load_room(file_name: String) -> Array[Callable]:
+func _load_room(file_name: String, size: int) -> Array[Callable]:
 	var file := FileAccess.open("res://main/%s" % file_name, FileAccess.READ)
 	var room := []
 	var lines := 0
@@ -94,11 +132,11 @@ func _load_room(file_name: String) -> Array[Callable]:
 		lines += 1
 		var line := file.get_line()
 		if line == "":
-			if lines == 17:
+			if lines == size + 1:
 				file.close()
 				return room
 			else:
-				for i in 16:
+				for i in size:
 					room.append(_false)
 		else:
 			var i = 0;
@@ -123,12 +161,12 @@ func _load_room(file_name: String) -> Array[Callable]:
 				else:
 					room.append(_get_type(line[i]))
 				i += 1
-			if chars != 16:
+			if chars != size:
 				push_warning("irregular line length %d in %s" % [chars, file_name])
 				file.close()
 				return []
 	file.close()
-	if lines != 16:
+	if lines != size:
 		push_warning("irregular line count %d in %s" % [(lines - 1), file_name])
 		return []
 	return room
@@ -145,11 +183,8 @@ func _build_room(room: Array, offset: Vector2i) -> void:
 			_add_cell(cell)
 		else:
 			_tile_layer.erase_cell(cell)
+	_decor_group_index += 10
 
 
 func _cell_full(cell: Vector2i) -> bool:
 	return _tile_layer.get_cell_source_id(cell) >= 0
-
-
-func _cell_empty(cell: Vector2i) -> bool:
-	return not _cell_full(cell)
