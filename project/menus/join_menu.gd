@@ -40,5 +40,5 @@ func _remove_player(id: int) -> void:
 func _start_game() -> void:
 	var game := preload("res://main/main.tscn").instantiate()
 	if _joined_players.size() > 0:
-		game.players = _joined_players
+		game.player_ids = _joined_players
 	get_tree().change_scene_to_node(game)

@@ -3,13 +3,15 @@ extends Node2D
 
 @export var apply_shadow := true
 
-var players : Array[int] = [0]
+var player_ids : Array[int] = [0]
 var _rooms : Array[Array] = []
 var _stairs : Array[Array] = []
 var _spawns : Array[Vector2i] = []
 var _decorations : Array[Array] = []
 var _decor_groups := {}
 var _decor_group_index := 0
+var _players : Array[Player] = []
+var _dead_players := 0
 
 @onready var _player_container := $PlayerContainer
 @onready var _darkness_layer := $CanvasModulate
@@ -22,11 +24,30 @@ func _ready() -> void:
 	_load_features_from_dir("stairs", _stairs)
 	_load_features_from_dir("decorations", _decorations, 3)
 	_build_complex()
-	for id in players:
+	for id in player_ids:
 		var player := preload("res://player/player.tscn").instantiate()
 		player.id = id
 		player.position = _spawns.pick_random() * 8
 		_player_container.add_child(player)
+		player.died.connect(_on_player_died)
+		_players.append(player)
+
+
+func _restart_game() -> void:
+	_dead_players = 0
+	_spawns.clear()
+	_decor_groups.clear()
+	_decor_group_index = 0
+	_build_complex()
+	for player in _players:
+		player.respawn(_spawns.pick_random() * 8)
+
+
+func _on_player_died() -> void:
+	_dead_players += 1
+	if _dead_players == _players.size() - 1:
+		await get_tree().create_timer(3.0).timeout
+		_restart_game()
 
 
 func _load_features_from_dir(dirname: String, destination: Array[Array], size := 16) -> void:

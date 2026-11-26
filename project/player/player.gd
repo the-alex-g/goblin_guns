@@ -1,6 +1,8 @@
 class_name Player
 extends CharacterBody2D
 
+signal died
+
 const GRAVITY := 480.0
 const ANIM_NAMES : PackedStringArray = ["level", "slant_up", "up", "slant_up", "level", "slant_down", "down", "slant_down", "level"]
 
@@ -25,7 +27,7 @@ var _can_attack := true
 var _health := 6 :
 	set(value):
 		if value <= 0:
-			queue_free()
+			_die()
 		_health = clampi(value, 0, 6)
 		_healthbar.set_instance_shader_parameter("percent", value / 6.0)
 var _special_animation_playing := false
@@ -34,7 +36,8 @@ var _aim_angle := 0.0
 
 @onready var _sprite := $AnimatedSprite2D
 @onready var _healthbar := $HealthBar
-@onready var _light := $PointLight2D
+@onready var _light : PointLight2D = $PointLight2D
+@onready var _collision_shape : CollisionShape2D = $CollisionShape2D
 
 func _physics_process(delta:float)->void:
 	if not is_on_floor() or velocity.y > 0.0:
@@ -51,6 +54,25 @@ func _physics_process(delta:float)->void:
 		_play_shoot_animation()
 	
 	move_and_slide()
+
+
+func _die() -> void:
+	if not disabled:
+		disabled = true
+		_light.enabled = false
+		_collision_shape.set_deferred("disabled", true)
+		hide()
+		died.emit()
+
+
+func respawn(pos: Vector2) -> void:
+	print("player %d respawning at %v" % [id, pos])
+	_health = 6
+	disabled = false
+	_light.enabled = true
+	global_position = pos
+	_collision_shape.disabled = false
+	show()
 
 
 func _get_movement_axis() -> float:
