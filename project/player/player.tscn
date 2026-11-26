@@ -358,13 +358,13 @@ position = Vector2(0, -8)
 
 [node name="AmmoWarning" type="Sprite2D" parent="." unique_id=158505141]
 visible = false
-position = Vector2(-8, -18)
+position = Vector2(-9, -18)
 scale = Vector2(2, 2)
 texture = ExtResource("8_rgyib")
 
 [node name="GrenadeWarning" type="Sprite2D" parent="." unique_id=788733471]
 visible = false
-position = Vector2(8, -18)
+position = Vector2(9, -18)
 scale = Vector2(2, 2)
 texture = ExtResource("8_rgyib")
 
