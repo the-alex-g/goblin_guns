@@ -24,8 +24,14 @@ const ANIM_NAMES : PackedStringArray = ["level", "slant_up", "up", "slant_up", "
 @export var gun_cooldown := 0.15
 @export var grenade_cooldown := 0.75
 @export var knockback := 5.0
-@export var ammo := 20
-@export var grenades := 5
+@export var ammo := 20 :
+	set(value):
+		ammo = max(0, value)
+		_ammo_warning.visible = ammo == 0 and not infinite_ammo
+@export var grenades := 5 :
+	set(value):
+		grenades = max(0, value)
+		_grenade_warning.visible = grenades == 0 and not infinite_ammo
 
 var _can_attack := true
 var _health := 6 :
@@ -43,6 +49,8 @@ var _aim_angle := 0.0
 @onready var _light : PointLight2D = $PointLight2D
 @onready var _collision_shape : CollisionShape2D = $CollisionShape2D
 @onready var _wall_detector : RayCast2D = $WallDetector
+@onready var _ammo_warning : Sprite2D = $AmmoWarning
+@onready var _grenade_warning : Sprite2D = $GrenadeWarning
 
 func _physics_process(delta:float)->void:
 	if not is_on_floor() or velocity.y > 0.0:

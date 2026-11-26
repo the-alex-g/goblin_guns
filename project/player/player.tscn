@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://bxtallcmb2x3s" path="res://player/textures/gunman_throw.png" id="4_g6k8r"]
 [ext_resource type="Shader" uid="uid://ci7gubnkf44y2" path="res://player/healthbar.gdshader" id="4_qjkh3"]
 [ext_resource type="Texture2D" uid="uid://dwcimsdanpvrv" path="res://player/textures/healthbar.png" id="4_yw30f"]
+[ext_resource type="Texture2D" uid="uid://duusnvs4tghma" path="res://player/textures/warning.png" id="8_rgyib"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_saui7"]
 size = Vector2(7, 15)
@@ -261,7 +262,70 @@ fill = 1
 fill_from = Vector2(0.5, 0.5)
 fill_to = Vector2(0.8636364, 0.84090906)
 
+[sub_resource type="Animation" id="Animation_rgyib"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("GrenadeWarning:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("AmmoWarning:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_hg6s5"]
+resource_name = "warning_blink"
+length = 1.4
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("GrenadeWarning:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.7),
+"transitions": PackedFloat32Array(1.6817931, 0.48296815),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("AmmoWarning:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.7),
+"transitions": PackedFloat32Array(1.6817931, 0.48296815),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_8t03j"]
+_data = {
+&"RESET": SubResource("Animation_rgyib"),
+&"warning_blink": SubResource("Animation_hg6s5")
+}
+
 [node name="Player" type="CharacterBody2D" unique_id=1037376385]
+texture_filter = 1
 collision_layer = 2
 script = ExtResource("1_oul6g")
 mouse_aim = true
@@ -291,5 +355,21 @@ texture = SubResource("GradientTexture2D_rgyib")
 
 [node name="WallDetector" type="RayCast2D" parent="." unique_id=20825840]
 position = Vector2(0, -8)
+
+[node name="AmmoWarning" type="Sprite2D" parent="." unique_id=158505141]
+visible = false
+position = Vector2(-8, -18)
+scale = Vector2(2, 2)
+texture = ExtResource("8_rgyib")
+
+[node name="GrenadeWarning" type="Sprite2D" parent="." unique_id=788733471]
+visible = false
+position = Vector2(8, -18)
+scale = Vector2(2, 2)
+texture = ExtResource("8_rgyib")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=964131152]
+libraries/ = SubResource("AnimationLibrary_8t03j")
+autoplay = &"warning_blink"
 
 [connection signal="animation_finished" from="AnimatedSprite2D" to="." method="_on_animated_sprite_2d_animation_finished"]
