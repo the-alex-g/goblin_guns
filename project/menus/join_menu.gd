@@ -1,7 +1,8 @@
 extends Control
 
-
 var _joined_players : Array[int] = []
+
+@onready var _players_joined_label : Label = $PlayersJoinedLabel
 
 
 func _input(event: InputEvent) -> void:
@@ -27,13 +28,19 @@ func _has_player(id: int) -> bool:
 	return _joined_players.has(id)
 
 
+func _update_label() -> void:
+	_players_joined_label.text = "%d players joined" % _joined_players.size()
+
+
 func _add_player(id: int) -> void:
 	_joined_players.append(id)
+	_update_label()
 	print("player %d joined" % id)
 
 
 func _remove_player(id: int) -> void:
 	_joined_players.erase(id)
+	_update_label()
 	print("player %d left" % id)
 
 
