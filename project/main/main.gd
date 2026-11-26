@@ -25,10 +25,14 @@ func _ready() -> void:
 	_load_features_from_dir("stairs", _stairs)
 	_load_features_from_dir("decorations", _decorations, 3)
 	_build_complex()
+	_initialize_players()
+
+
+func _initialize_players() -> void:
 	for id in player_ids:
 		var player := preload("res://player/player.tscn").instantiate()
 		player.id = id
-		player.position = _spawns.pick_random() * 8
+		player.position = _get_spawn_point()
 		_player_container.add_child(player)
 		player.died.connect(_on_player_died)
 		player.weapon_fired.connect(_weapon_container.add_child)
@@ -42,9 +46,16 @@ func _restart_game() -> void:
 	_decor_group_index = 0
 	_build_complex()
 	for player in _players:
-		player.respawn(_spawns.pick_random() * 8)
+		player.respawn(_get_spawn_point())
 	for weapon in _weapon_container.get_children():
 		weapon.queue_free()
+
+
+func _get_spawn_point() -> Vector2:
+	var index := randi() % _spawns.size()
+	var point := _spawns[index]
+	_spawns.remove_at(index)
+	return point * 8
 
 
 func _on_player_died() -> void:
