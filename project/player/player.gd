@@ -2,6 +2,7 @@ class_name Player
 extends CharacterBody2D
 
 signal died
+signal weapon_fired(node: Node2D)
 
 const GRAVITY := 480.0
 const ANIM_NAMES : PackedStringArray = ["level", "slant_up", "up", "slant_up", "level", "slant_down", "down", "slant_down", "level"]
@@ -193,7 +194,7 @@ func _fire_bullet() -> void:
 	var bullet : Bullet = preload("res://projectiles/bullet.tscn").instantiate()
 	bullet.velocity = bullet_velocity
 	bullet.global_position = _get_launch_position()
-	get_tree().root.add_child(bullet)
+	weapon_fired.emit(bullet)
 	_add_muzzle_flash()
 	_run_cooldown(gun_cooldown)
 	velocity -= Vector2.from_angle(_aim_angle) * knockback
@@ -206,7 +207,7 @@ func _play_special_animation(anim_name: String) -> void:
 
 func _throw_grenade(grenade: RigidBody2D) -> void:
 	grenade.global_position = _get_launch_position()
-	get_tree().root.add_child(grenade)
+	weapon_fired.emit(grenade)
 	grenade.apply_central_impulse(Vector2.from_angle(_aim_angle) * grenade_speed)
 	_play_special_animation("throw_grenade")
 	_run_cooldown(grenade_cooldown)

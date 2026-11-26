@@ -16,6 +16,7 @@ var _dead_players := 0
 @onready var _player_container := $PlayerContainer
 @onready var _darkness_layer := $CanvasModulate
 @onready var _tile_layer := $TileMapLayer
+@onready var _weapon_container := $WeaponContainer
 
 
 func _ready() -> void:
@@ -30,6 +31,7 @@ func _ready() -> void:
 		player.position = _spawns.pick_random() * 8
 		_player_container.add_child(player)
 		player.died.connect(_on_player_died)
+		player.weapon_fired.connect(_weapon_container.add_child)
 		_players.append(player)
 
 
@@ -41,6 +43,8 @@ func _restart_game() -> void:
 	_build_complex()
 	for player in _players:
 		player.respawn(_spawns.pick_random() * 8)
+	for weapon in _weapon_container.get_children():
+		weapon.queue_free()
 
 
 func _on_player_died() -> void:
