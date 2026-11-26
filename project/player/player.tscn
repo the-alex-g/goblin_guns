@@ -340,7 +340,6 @@ _data = {
 texture_filter = 1
 collision_layer = 2
 script = ExtResource("1_oul6g")
-mouse_aim = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1702218849]
 position = Vector2(0, -7.5)

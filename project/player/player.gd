@@ -72,7 +72,7 @@ func _physics_process(delta:float)->void:
 func _die() -> void:
 	if not disabled:
 		disabled = true
-		create_tween().tween_property(_light, "energy", 0.0, 0.5).from_current().set_trans(Tween.TRANS_CUBIC)
+		create_tween().tween_property(_light, "energy", 0.0, 0.7).from_current().set_trans(Tween.TRANS_QUAD)
 		_collision_shape.set_deferred("disabled", true)
 		died.emit()
 		_play_special_animation("die")

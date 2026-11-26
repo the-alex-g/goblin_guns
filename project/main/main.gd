@@ -162,7 +162,8 @@ func _get_type(c: String) -> Callable:
 		return func(pos: Vector2i): return _cell_full(pos + Vector2i.UP)
 	elif c == "$":
 		return func(pos: Vector2i):
-			_spawns.append(pos)
+			if not _cell_full(pos + Vector2i.UP):
+				_spawns.append(pos)
 			return true
 	elif c.is_valid_int():
 		return func(pos: Vector2i):
