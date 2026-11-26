@@ -73,17 +73,17 @@ func _physics_process(delta:float)->void:
 func _die() -> void:
 	if not disabled:
 		disabled = true
-		_light.enabled = false
+		create_tween().tween_property(_light, "energy", 0.0, 0.5).from_current().set_trans(Tween.TRANS_CUBIC)
 		_collision_shape.set_deferred("disabled", true)
-		hide()
 		died.emit()
+		_play_special_animation("die")
 
 
 func respawn(pos: Vector2) -> void:
 	print("player %d respawning at %v" % [id, pos])
 	_health = 6
 	disabled = false
-	_light.enabled = true
+	_light.energy = 1.0
 	global_position = pos
 	_collision_shape.disabled = false
 	show()
@@ -242,3 +242,5 @@ func hit(amount: int) -> void:
 
 func _on_animated_sprite_2d_animation_finished() -> void:
 	_special_animation_playing = false
+	if _sprite.animation == "die":
+		hide()

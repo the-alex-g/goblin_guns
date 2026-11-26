@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://doiun1uhlaoho"]
 
 [ext_resource type="Script" uid="uid://dx8r7x42l5ilj" path="res://player/player.gd" id="1_oul6g"]
-[ext_resource type="Texture2D" uid="uid://d1u3utenlng3j" path="res://player/textures/player.png" id="2_rkbax"]
+[ext_resource type="Texture2D" uid="uid://cn2gvr2t8qm34" path="res://player/textures/death.png" id="2_rgyib"]
 [ext_resource type="Texture2D" uid="uid://byfr0kknuotsq" path="res://player/textures/gunman.png" id="3_g1dw6"]
 [ext_resource type="Texture2D" uid="uid://dsp2rui30e6vk" path="res://player/textures/gunman_run.png" id="4_boad6"]
 [ext_resource type="Texture2D" uid="uid://bxtallcmb2x3s" path="res://player/textures/gunman_throw.png" id="4_g6k8r"]
@@ -12,21 +12,29 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_saui7"]
 size = Vector2(7, 15)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_g1dw6"]
-atlas = ExtResource("2_rkbax")
-region = Rect2(0, 0, 16, 16)
+[sub_resource type="AtlasTexture" id="AtlasTexture_uw77l"]
+atlas = ExtResource("2_rgyib")
+region = Rect2(0, 0, 8, 9)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_yw30f"]
-atlas = ExtResource("2_rkbax")
-region = Rect2(32, 0, 16, 16)
+[sub_resource type="AtlasTexture" id="AtlasTexture_rptt4"]
+atlas = ExtResource("2_rgyib")
+region = Rect2(8, 0, 8, 9)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_qjkh3"]
-atlas = ExtResource("2_rkbax")
-region = Rect2(16, 0, 16, 16)
+[sub_resource type="AtlasTexture" id="AtlasTexture_r7pn3"]
+atlas = ExtResource("2_rgyib")
+region = Rect2(16, 0, 8, 9)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_g6k8r"]
-atlas = ExtResource("2_rkbax")
-region = Rect2(32, 0, 16, 16)
+[sub_resource type="AtlasTexture" id="AtlasTexture_b8hi5"]
+atlas = ExtResource("2_rgyib")
+region = Rect2(0, 9, 8, 9)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2uvqg"]
+atlas = ExtResource("2_rgyib")
+region = Rect2(8, 9, 8, 9)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1s1yo"]
+atlas = ExtResource("2_rgyib")
+region = Rect2(16, 9, 8, 9)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_boad6"]
 atlas = ExtResource("3_g1dw6")
@@ -112,25 +120,29 @@ region = Rect2(0, 18, 9, 9)
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_g1dw6")
+"texture": SubResource("AtlasTexture_uw77l")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_yw30f")
+"texture": SubResource("AtlasTexture_rptt4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_r7pn3")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_b8hi5")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2uvqg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1s1yo")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1s1yo")
 }],
-"loop": 1,
-"name": &"idle",
-"speed": 2.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_qjkh3")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_g6k8r")
-}],
-"loop": 1,
-"name": &"run",
-"speed": 5.0
+"loop": 0,
+"name": &"die",
+"speed": 10.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -339,7 +351,9 @@ texture_filter = 1
 position = Vector2(-1, -9)
 scale = Vector2(2, 2)
 sprite_frames = SubResource("SpriteFrames_oul6g")
-animation = &"shoot_slant_down"
+animation = &"die"
+frame = 5
+frame_progress = 1.0
 offset = Vector2(2, 0)
 
 [node name="HealthBar" type="Sprite2D" parent="." unique_id=1510108352]

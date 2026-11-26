@@ -74,7 +74,7 @@ func _get_spawn_point() -> Vector2:
 
 func _on_player_died() -> void:
 	_dead_players += 1
-	if _dead_players == _players.size() - 1:
+	if _dead_players == _players.size() - 1 or _players.size() == 1:
 		await get_tree().create_timer(3.0).timeout
 		_restart_game()
 
