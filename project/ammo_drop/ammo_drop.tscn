@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://dgintw8s5ch6d"]
+
+[ext_resource type="Texture2D" uid="uid://cqpkvepufq2vf" path="res://ammo_drop/ammo_dump.png" id="1_86mjn"]
+[ext_resource type="Script" uid="uid://bon5mchqoakic" path="res://ammo_drop/ammo_drop.gd" id="1_mp17y"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_saui7"]
+radius = 3.0
+
+[node name="AmmoDrop" type="Area2D" unique_id=162694210]
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+script = ExtResource("1_mp17y")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=367800778]
+position = Vector2(0, -3)
+shape = SubResource("CircleShape2D_saui7")
+
+[node name="AmmoDump" type="Sprite2D" parent="." unique_id=383978501]
+texture_filter = 1
+position = Vector2(0, -3)
+texture = ExtResource("1_86mjn")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

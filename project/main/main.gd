@@ -2,6 +2,8 @@ class_name Main
 extends Node2D
 
 @export var apply_shadow := true
+@export var spawn_ammo_dumps := true
+@export var dump_spawn_chance := 0.8
 
 var player_ids : Array[int] = [0]
 var _rooms : Array[Array] = []
@@ -16,7 +18,7 @@ var _dead_players := 0
 @onready var _player_container := $PlayerContainer
 @onready var _darkness_layer := $CanvasModulate
 @onready var _tile_layer := $TileMapLayer
-@onready var _weapon_container := $WeaponContainer
+@onready var _temp_container := $TempContainer
 
 
 func _ready() -> void:
@@ -26,16 +28,18 @@ func _ready() -> void:
 	_load_features_from_dir("decorations", _decorations, 3)
 	_build_complex()
 	_initialize_players()
+	_place_ammo_dumps()
 
 
 func _initialize_players() -> void:
 	for id in player_ids:
-		var player := preload("res://player/player.tscn").instantiate()
+		var player : Player = preload("res://player/player.tscn").instantiate()
 		player.id = id
 		player.position = _get_spawn_point()
 		_player_container.add_child(player)
 		player.died.connect(_on_player_died)
-		player.weapon_fired.connect(_weapon_container.add_child)
+		player.weapon_fired.connect(_temp_container.add_child)
+		player.infinite_ammo = not spawn_ammo_dumps
 		_players.append(player)
 
 
@@ -47,8 +51,18 @@ func _restart_game() -> void:
 	_build_complex()
 	for player in _players:
 		player.respawn(_get_spawn_point())
-	for weapon in _weapon_container.get_children():
-		weapon.queue_free()
+	for tmp in _temp_container.get_children():
+		tmp.queue_free()
+	_place_ammo_dumps()
+
+
+func _place_ammo_dumps() -> void:
+	if spawn_ammo_dumps:
+		for pos in _spawns:
+			if randf() < dump_spawn_chance:
+				var dump := preload("res://ammo_drop/ammo_drop.tscn").instantiate()
+				dump.position = pos * 8
+				_temp_container.add_child(dump)
 
 
 func _get_spawn_point() -> Vector2:

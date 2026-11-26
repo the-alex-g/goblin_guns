@@ -12,6 +12,7 @@ const ANIM_NAMES : PackedStringArray = ["level", "slant_up", "up", "slant_up", "
 @export var mouse_aim := false :
 	get:
 		return mouse_aim and id == 0
+@export var infinite_ammo := false
 @export_group("movement")
 @export var speed := 100
 @export var slide := Vector2(0.3, 0.1)
@@ -23,6 +24,8 @@ const ANIM_NAMES : PackedStringArray = ["level", "slant_up", "up", "slant_up", "
 @export var gun_cooldown := 0.15
 @export var grenade_cooldown := 0.75
 @export var knockback := 5.0
+@export var ammo := 20
+@export var grenades := 5
 
 var _can_attack := true
 var _health := 6 :
@@ -107,9 +110,9 @@ func _process_actions()->void:
 	
 	if _is_action_pressed("jump", JoyButton.JOY_BUTTON_A) and is_on_floor():
 		velocity.y -= jump_strength
-	if _is_action_pressed("fire", JoyButton.JOY_BUTTON_RIGHT_SHOULDER) and _can_attack:
+	if _is_action_pressed("fire", JoyButton.JOY_BUTTON_RIGHT_SHOULDER) and _can_attack and (ammo > 0 or infinite_ammo):
 		_fire_bullet()
-	if _is_axis_action_pressed("frag", JoyAxis.JOY_AXIS_TRIGGER_RIGHT) and _can_attack:
+	if _is_axis_action_pressed("frag", JoyAxis.JOY_AXIS_TRIGGER_RIGHT) and _can_attack and (grenades > 0 or infinite_ammo):
 		_throw_grenade(preload("res://grenades/frag_grenade.tscn").instantiate())
 	var sneaking := _is_axis_action_pressed("sneak", JoyAxis.JOY_AXIS_TRIGGER_LEFT)
 	if sneaking and _light_on:
@@ -198,6 +201,7 @@ func _fire_bullet() -> void:
 	_add_muzzle_flash()
 	_run_cooldown(gun_cooldown)
 	velocity -= Vector2.from_angle(_aim_angle) * knockback
+	ammo -= 1
 
 
 func _play_special_animation(anim_name: String) -> void:
@@ -211,6 +215,7 @@ func _throw_grenade(grenade: RigidBody2D) -> void:
 	grenade.apply_central_impulse(Vector2.from_angle(_aim_angle) * grenade_speed)
 	_play_special_animation("throw_grenade")
 	_run_cooldown(grenade_cooldown)
+	grenades -= 1
 
 
 func hit(amount: int) -> void:
