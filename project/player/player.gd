@@ -241,6 +241,10 @@ func hit(amount: int) -> void:
 	_health -= amount
 
 
+func heal(amount: int) -> void:
+	_health += amount
+
+
 func _on_animated_sprite_2d_animation_finished() -> void:
 	_special_animation_playing = false
 	if _sprite.animation == "die":
