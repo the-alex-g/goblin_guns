@@ -94,10 +94,8 @@ func _is_action_pressed(action_name: String, button: JoyButton) -> bool:
 	return Input.is_joy_button_pressed(id, button)
 
 
-func _is_sneaking() -> float:
-	if id == 0 and Input.is_action_pressed("sneak"):
-		return true
-	return Input.get_joy_axis(id, JOY_AXIS_TRIGGER_LEFT) > 0.5
+func _is_axis_action_pressed(action_name: String, axis: JoyAxis) -> bool:
+	return (id == 0 and Input.is_action_pressed(action_name)) or Input.get_joy_axis(id, axis) > 0.5
 
 
 func _process_actions()->void:
@@ -110,9 +108,9 @@ func _process_actions()->void:
 		velocity.y -= jump_strength
 	if _is_action_pressed("fire", JoyButton.JOY_BUTTON_RIGHT_SHOULDER) and _can_attack:
 		_fire_bullet()
-	if Input.get_joy_axis(id, JOY_AXIS_TRIGGER_RIGHT) > 0.5 and _can_attack:
+	if _is_axis_action_pressed("frag", JoyAxis.JOY_AXIS_TRIGGER_RIGHT) and _can_attack:
 		_throw_grenade(preload("res://grenades/frag_grenade.tscn").instantiate())
-	var sneaking := _is_sneaking()
+	var sneaking := _is_axis_action_pressed("sneak", JoyAxis.JOY_AXIS_TRIGGER_LEFT)
 	if sneaking and _light_on:
 		_light_on = false
 		get_tree().create_tween().tween_property(_light, "energy", 0.0, 0.25).from_current().set_trans(Tween.TRANS_QUAD)
