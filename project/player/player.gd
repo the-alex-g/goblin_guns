@@ -42,6 +42,7 @@ var _aim_angle := 0.0
 @onready var _healthbar := $HealthBar
 @onready var _light : PointLight2D = $PointLight2D
 @onready var _collision_shape : CollisionShape2D = $CollisionShape2D
+@onready var _wall_detector : RayCast2D = $WallDetector
 
 func _physics_process(delta:float)->void:
 	if not is_on_floor() or velocity.y > 0.0:
@@ -58,6 +59,7 @@ func _physics_process(delta:float)->void:
 		_play_shoot_animation()
 	
 	move_and_slide()
+	queue_redraw()
 
 
 func _die() -> void:
@@ -149,8 +151,14 @@ func _update_aim_angle() -> void:
 		_aim_angle = _clamp_angle(controller_aim.angle())
 
 
-func _get_launch_position() -> Vector2:
-	return global_position + Vector2.from_angle(_aim_angle) * 12 + Vector2.UP * 8
+func _get_launch_position(no_obstruction := false) -> Vector2:
+	var offset := Vector2.from_angle(_aim_angle) * 12
+	if no_obstruction:
+		_wall_detector.target_position = offset
+		_wall_detector.force_raycast_update()
+		if _wall_detector.is_colliding():
+			return Vector2.INF
+	return offset + global_position + Vector2.UP * 8
 
 
 func _play_shoot_anim_by_name(base: String) -> void:
@@ -210,12 +218,14 @@ func _play_special_animation(anim_name: String) -> void:
 
 
 func _throw_grenade(grenade: RigidBody2D) -> void:
-	grenade.global_position = _get_launch_position()
-	weapon_fired.emit(grenade)
-	grenade.apply_central_impulse(Vector2.from_angle(_aim_angle) * grenade_speed)
-	_play_special_animation("throw_grenade")
-	_run_cooldown(grenade_cooldown)
-	grenades -= 1
+	var pos := _get_launch_position(true)
+	if pos != Vector2.INF:
+		grenade.global_position = pos
+		weapon_fired.emit(grenade)
+		grenade.apply_central_impulse(Vector2.from_angle(_aim_angle) * grenade_speed)
+		_play_special_animation("throw_grenade")
+		_run_cooldown(grenade_cooldown)
+		grenades -= 1
 
 
 func hit(amount: int) -> void:

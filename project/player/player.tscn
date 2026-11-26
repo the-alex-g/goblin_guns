@@ -289,4 +289,7 @@ position = Vector2(0, -8)
 shadow_enabled = true
 texture = SubResource("GradientTexture2D_rgyib")
 
+[node name="WallDetector" type="RayCast2D" parent="." unique_id=20825840]
+position = Vector2(0, -8)
+
 [connection signal="animation_finished" from="AnimatedSprite2D" to="." method="_on_animated_sprite_2d_animation_finished"]
