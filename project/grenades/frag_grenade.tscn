@@ -20,6 +20,7 @@ fill_from = Vector2(0.5, 0.5)
 fill_to = Vector2(0.5, 0)
 
 [node name="FragGrenade" type="RigidBody2D" unique_id=2055212464]
+visible = false
 collision_layer = 4
 collision_mask = 3
 physics_material_override = SubResource("PhysicsMaterial_g1dw6")

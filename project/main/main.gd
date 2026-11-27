@@ -17,7 +17,7 @@ var _dead_players := 0
 
 @onready var _player_container := $PlayerContainer
 @onready var _darkness_layer := $CanvasModulate
-@onready var _tile_layer := $TileMapLayer
+@onready var _tile_layer : TileMapLayer = $TileMapLayer
 @onready var _temp_container := $TempContainer
 
 
@@ -41,7 +41,12 @@ func _initialize_players() -> void:
 		player.color = Player.COLORS[color_index]
 		color_index += 1
 		player.died.connect(_on_player_died)
-		player.weapon_fired.connect(_temp_container.add_child)
+		player.weapon_fired.connect(
+			func(weapon: Node2D):
+				_temp_container.add_child(weapon)
+				if weapon is ExplosiveGrenade:
+					weapon.exploded.connect(_on_grenade_exploded)
+		)
 		player.infinite_ammo = not spawn_ammo_dumps
 		_players.append(player)
 
@@ -246,3 +251,14 @@ func _build_room(room: Array, offset: Vector2i) -> void:
 
 func _cell_full(cell: Vector2i) -> bool:
 	return _tile_layer.get_cell_source_id(cell) >= 0
+
+
+func _on_grenade_exploded(pos: Vector2) -> void:
+	var tile_pos := _tile_layer.local_to_map(pos)
+	for x in 3:
+		for y in 3:
+			_tile_layer.erase_cell(tile_pos - Vector2i(x - 1, y - 1))
+	for player in _players:
+		var distance := player.position.distance_to(pos) / 8
+		if distance < 4:
+			player.hit(ceili(2 * (4 - distance)))

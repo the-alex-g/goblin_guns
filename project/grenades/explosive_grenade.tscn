@@ -1,0 +1,36 @@
+[gd_scene format=3 uid="uid://bi0r5f5hxoogj"]
+
+[ext_resource type="Script" uid="uid://bjyeaydgdwjg1" path="res://grenades/explosive_grenade.gd" id="1_2equ7"]
+[ext_resource type="Texture2D" uid="uid://d05vb4go2ppwp" path="res://grenades/grenade.png" id="2_kva0g"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_saui7"]
+radius = 2.0
+
+[sub_resource type="Gradient" id="Gradient_rpyfc"]
+colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_kva0g"]
+gradient = SubResource("Gradient_rpyfc")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.5, 0)
+
+[node name="ExplosiveGrenade" type="Area2D" unique_id=1124982238]
+collision_layer = 4
+collision_mask = 3
+script = ExtResource("1_2equ7")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1396493566]
+shape = SubResource("CircleShape2D_saui7")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1954476514]
+texture_filter = 1
+texture = ExtResource("2_kva0g")
+
+[node name="PointLight2D" type="PointLight2D" parent="." unique_id=1401029686]
+enabled = false
+energy = 2.0
+shadow_enabled = true
+texture = SubResource("GradientTexture2D_kva0g")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

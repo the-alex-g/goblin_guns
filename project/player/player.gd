@@ -125,7 +125,7 @@ func _process_actions()->void:
 	if _is_action_pressed("fire", JoyButton.JOY_BUTTON_RIGHT_SHOULDER) and _can_attack and (ammo > 0 or infinite_ammo):
 		_fire_bullet()
 	if _is_action_pressed("frag", JoyButton.JOY_BUTTON_LEFT_SHOULDER) and _can_attack and (grenades > 0 or infinite_ammo):
-		_throw_grenade(preload("res://grenades/frag_grenade.tscn").instantiate())
+		_throw_grenade(preload("res://grenades/explosive_grenade.tscn").instantiate())
 	var sneaking := _is_axis_action_pressed("sneak", JoyAxis.JOY_AXIS_TRIGGER_LEFT)
 	if sneaking and _light_on:
 		_light_on = false
@@ -227,12 +227,15 @@ func _play_special_animation(anim_name: String) -> void:
 	_special_animation_playing = true
 
 
-func _throw_grenade(grenade: RigidBody2D) -> void:
+func _throw_grenade(grenade: Node2D) -> void:
 	var pos := _get_launch_position(true)
 	if pos != Vector2.INF:
 		grenade.global_position = pos
 		weapon_fired.emit(grenade)
-		grenade.apply_central_impulse(Vector2.from_angle(_aim_angle) * grenade_speed)
+		if grenade is RigidBody2D:
+			grenade.apply_central_impulse(Vector2.from_angle(_aim_angle) * grenade_speed)
+		elif grenade is ExplosiveGrenade:
+			grenade.velocity = Vector2.from_angle(_aim_angle) * grenade_speed
 		_play_special_animation("throw_grenade")
 		_run_cooldown(grenade_cooldown)
 		grenades -= 1
