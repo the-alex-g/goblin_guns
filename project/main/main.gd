@@ -32,11 +32,14 @@ func _ready() -> void:
 
 
 func _initialize_players() -> void:
+	var color_index := 0
 	for id in player_ids:
 		var player : Player = preload("res://player/player.tscn").instantiate()
 		player.id = id
 		player.position = _get_spawn_point()
 		_player_container.add_child(player)
+		player.color = Player.COLORS[color_index]
+		color_index += 1
 		player.died.connect(_on_player_died)
 		player.weapon_fired.connect(_temp_container.add_child)
 		player.infinite_ammo = not spawn_ammo_dumps

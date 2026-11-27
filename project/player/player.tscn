@@ -1,5 +1,6 @@
 [gd_scene format=3 uid="uid://doiun1uhlaoho"]
 
+[ext_resource type="Shader" uid="uid://b0qsjpjxewbuy" path="res://player/player.gdshader" id="1_hg6s5"]
 [ext_resource type="Script" uid="uid://dx8r7x42l5ilj" path="res://player/player.gd" id="1_oul6g"]
 [ext_resource type="Texture2D" uid="uid://cn2gvr2t8qm34" path="res://player/textures/death.png" id="2_rgyib"]
 [ext_resource type="Texture2D" uid="uid://byfr0kknuotsq" path="res://player/textures/gunman.png" id="3_g1dw6"]
@@ -11,6 +12,9 @@
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_saui7"]
 size = Vector2(7, 15)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_hg6s5"]
+shader = ExtResource("1_hg6s5")
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_uw77l"]
 atlas = ExtResource("2_rgyib")
@@ -340,19 +344,19 @@ _data = {
 texture_filter = 1
 collision_layer = 2
 script = ExtResource("1_oul6g")
+mouse_aim = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1702218849]
 position = Vector2(0, -7.5)
 shape = SubResource("RectangleShape2D_saui7")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1557501996]
-texture_filter = 1
+material = SubResource("ShaderMaterial_hg6s5")
+instance_shader_parameters/color = Vector3(1, 0, 0)
 position = Vector2(-1, -9)
 scale = Vector2(2, 2)
 sprite_frames = SubResource("SpriteFrames_oul6g")
-animation = &"die"
-frame = 5
-frame_progress = 1.0
+animation = &"shoot_level_run"
 offset = Vector2(2, 0)
 
 [node name="HealthBar" type="Sprite2D" parent="." unique_id=1510108352]

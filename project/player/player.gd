@@ -5,13 +5,22 @@ signal died
 signal weapon_fired(node: Node2D)
 
 const GRAVITY := 480.0
-const ANIM_NAMES : PackedStringArray = ["level", "slant_up", "up", "slant_up", "level", "slant_down", "down", "slant_down", "level"]
+const ANIM_NAMES : PackedStringArray = [
+	"level", "slant_up", "up", "slant_up", "level", "slant_down", "down", "slant_down", "level"
+]
+const COLORS : PackedColorArray = [
+	Color.DARK_RED, Color.DARK_GREEN, Color.MIDNIGHT_BLUE, Color.DARK_GOLDENROD
+]
 
 @export var disabled := false
 @export var id := 0
 @export var mouse_aim := false :
 	get:
 		return mouse_aim and id == 0
+@export var color := Color.WHITE :
+	set(value):
+		color = value
+		_sprite.set_instance_shader_parameter("color", color)
 @export var infinite_ammo := false
 @export_group("movement")
 @export var speed := 100
@@ -47,20 +56,18 @@ var _aim_angle := 0.0
 @onready var _sprite := $AnimatedSprite2D
 @onready var _healthbar := $HealthBar
 @onready var _light : PointLight2D = $PointLight2D
-@onready var _collision_shape : CollisionShape2D = $CollisionShape2D
 @onready var _wall_detector : RayCast2D = $WallDetector
 @onready var _ammo_warning : Sprite2D = $AmmoWarning
 @onready var _grenade_warning : Sprite2D = $GrenadeWarning
 
 func _physics_process(delta:float)->void:
+	if not is_on_floor() or velocity.y > 0.0:
+		velocity.y += GRAVITY * delta
+	
 	if disabled:
 		return
 	
-	if not is_on_floor() or velocity.y > 0.0:
-		velocity.y += GRAVITY * delta
-
 	_process_actions()
-	
 	_update_aim_angle()
 	
 	if not _special_animation_playing:
@@ -73,18 +80,15 @@ func _die() -> void:
 	if not disabled:
 		disabled = true
 		create_tween().tween_property(_light, "energy", 0.0, 0.7).from_current().set_trans(Tween.TRANS_QUAD)
-		_collision_shape.set_deferred("disabled", true)
 		died.emit()
 		_play_special_animation("die")
 
 
 func respawn(pos: Vector2) -> void:
-	print("player %d respawning at %v" % [id, pos])
 	_health = 6
 	disabled = false
 	_light.energy = 1.0
 	global_position = pos
-	_collision_shape.disabled = false
 	ammo = 20
 	grenades = 5
 	show()
