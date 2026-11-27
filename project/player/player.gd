@@ -64,14 +64,12 @@ func _physics_process(delta:float)->void:
 	if not is_on_floor() or velocity.y > 0.0:
 		velocity.y += GRAVITY * delta
 	
-	if disabled:
-		return
+	if not disabled:
+		_process_actions()
+		_update_aim_angle()
 	
-	_process_actions()
-	_update_aim_angle()
-	
-	if not _special_animation_playing:
-		_play_shoot_animation()
+		if not _special_animation_playing:
+			_play_shoot_animation()
 	
 	move_and_slide()
 
@@ -91,7 +89,6 @@ func respawn(pos: Vector2) -> void:
 	global_position = pos
 	ammo = 20
 	grenades = 5
-	show()
 
 
 func _get_movement_axis() -> float:
@@ -251,5 +248,3 @@ func heal(amount: int) -> void:
 
 func _on_animated_sprite_2d_animation_finished() -> void:
 	_special_animation_playing = false
-	if _sprite.animation == "die":
-		hide()

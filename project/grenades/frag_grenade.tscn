@@ -42,6 +42,7 @@ shape = SubResource("CircleShape2D_saui7")
 [node name="PointLight2D" type="PointLight2D" parent="." unique_id=682207747]
 enabled = false
 energy = 2.0
+shadow_enabled = true
 texture = SubResource("GradientTexture2D_xadyu")
 
 [connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

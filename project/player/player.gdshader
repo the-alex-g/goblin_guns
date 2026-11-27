@@ -1,8 +1,8 @@
 shader_type canvas_item;
 
 instance uniform vec3 color = vec3(1.0, 0.0, 0.0);
-const float outline_size = 0.25;
-const bool outline = false;
+const float outline_size = 0.5;
+const bool outline = true;
 
 
 bool check_pixel(vec2 position, sampler2D txtr) {
