@@ -250,14 +250,16 @@ func _build_room(room: Array, offset: Vector2i) -> void:
 
 
 func _cell_full(cell: Vector2i) -> bool:
-	return _tile_layer.get_cell_source_id(cell) >= 0
+	return _tile_layer.get_cell_source_id(cell) == 0
 
 
 func _on_grenade_exploded(pos: Vector2) -> void:
 	var tile_pos := _tile_layer.local_to_map(pos)
 	for x in 3:
 		for y in 3:
-			_tile_layer.erase_cell(tile_pos - Vector2i(x - 1, y - 1))
+			var pos_to_destroy := tile_pos - Vector2i(x - 1, y - 1)
+			if pos_to_destroy.x > 0 and pos_to_destroy.x < 81 and pos_to_destroy.y > 0 and pos_to_destroy.y < 49 and _cell_full(pos_to_destroy):
+				_tile_layer.set_cell(pos_to_destroy, 1, Vector2i.ZERO)
 	for player in _players:
 		var distance := player.position.distance_to(pos) / 8
 		if distance < 4:
