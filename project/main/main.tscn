@@ -27,6 +27,7 @@ sources/1 = SubResource("TileSetAtlasSource_pjrb6")
 
 [node name="Main" type="Node2D" unique_id=1247647158]
 script = ExtResource("1_xwkvk")
+apply_shadow = false
 
 [node name="ColorRect" type="ColorRect" parent="." unique_id=2040054560]
 offset_left = -16.0

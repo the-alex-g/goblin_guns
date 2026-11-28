@@ -261,6 +261,6 @@ func _on_grenade_exploded(pos: Vector2) -> void:
 			if pos_to_destroy.x > 0 and pos_to_destroy.x < 81 and pos_to_destroy.y > 0 and pos_to_destroy.y < 49 and _cell_full(pos_to_destroy):
 				_tile_layer.set_cell(pos_to_destroy, 1, Vector2i.ZERO)
 	for player in _players:
-		var distance := player.position.distance_to(pos) / 8
+		var distance := player.position.distance_to(pos) / 8.0
 		if distance < 4:
 			player.hit(ceili(2 * (4 - distance)))

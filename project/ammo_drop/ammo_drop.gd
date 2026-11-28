@@ -1,3 +1,4 @@
+class_name AmmoDump
 extends Area2D
 
 enum {AMMO, HEALTH}
